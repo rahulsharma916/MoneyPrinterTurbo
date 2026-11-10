@@ -11,7 +11,31 @@ This utility converts a UTF-8 CSV content calendar into a validated batch manife
 
 Keep each channel's brand name, logo, voice, thumbnail style, descriptions, playlists, upload defaults, and analytics separate. Do not mix devotional topics into the motivational channel or vice versa. Mythology is part of the devotional channel when it is framed as devotional/epic storytelling.
 
-## Channel configuration (Phase 3)\n\n`channel_configs.json` stores independent identity and production defaults for the two channels: language, Shorts/long-form aspect ratios, voice overrides, creative direction, thumbnail direction, music guidance, SEO defaults, and publishing safeguards. The file contains no credentials. Configure actual channel IDs and voice names only after confirming the correct accounts and provider voices.\n\nValidate the configuration from the repository root:\n\n```bash\npython automation/validate_channel_configs.py\npython -m unittest automation.tests.test_channel_configs\n```\n\nBoth channels intentionally start with publishing disabled, private visibility, mandatory human approval, and an unset `made_for_kids` declaration. Do not change the audience declaration without reviewing the actual video. The account environment-variable names are placeholders; they are not connected to the existing Upload-Post integration yet.\n\n## 1. Apply the correct channel profile
+## Channel configuration (Phase 3)\n\n`channel_configs.json` stores independent identity and production defaults for the two channels: language, Shorts/long-form aspect ratios, voice overrides, creative direction, thumbnail direction, music guidance, SEO defaults, and publishing safeguards. The file contains no credentials. Configure actual channel IDs and voice names only after confirming the correct accounts and provider voices.\n\nValidate the configuration from the repository root:\n\n```bash\npython automation/validate_channel_configs.py\npython -m unittest automation.tests.test_channel_configs\n```\n\nBoth channels intentionally start with publishing disabled, private visibility, mandatory human approval, and an unset `made_for_kids` declaration. Do not change the audience declaration without reviewing the actual video. The account environment-variable names are placeholders; they are not connected to the existing Upload-Post integration yet.\n\n## Channel-aware production preparation (Phase 4)
+
+After applying the content profile, apply the channel's production defaults to the enriched calendar. Non-empty row-level values take priority over channel defaults.
+
+```bash
+python automation/prepare_channel_calendar.py automation/examples/devotional_channel_calendar.devotional.csv --channel devotional
+python automation/prepare_channel_calendar.py automation/examples/motivational_channel_calendar.motivation.csv --channel motivation
+```
+
+Each command creates a separate production CSV. Convert each prepared CSV into its own batch manifest:
+
+```bash
+python automation/content_calendar_to_batch.py automation/examples/devotional_channel_calendar.devotional.production.csv
+python automation/content_calendar_to_batch.py automation/examples/motivational_channel_calendar.motivation.production.csv
+```
+
+Run the resulting manifests with the existing CLI only after reviewing them. Validate with:
+
+```bash
+python -m unittest automation.tests.test_prepare_channel_calendar
+```
+
+This step applies locale, voice overrides, voice rate/volume, subtitles, default aspect ratio, and channel-specific scene-friendly narration context. Thumbnail and music directions remain editorial guidance only: this phase does not create thumbnail images, generate custom music, produce SEO metadata, automatically select a verified TTS voice, or connect publishing accounts. Publishing remains a separate manually reviewed action.
+
+## 1. Apply the correct channel profile
 
 From the repository root:
 
