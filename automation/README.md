@@ -61,3 +61,28 @@ The CLI's own generation settings and provider credentials still apply. The gene
 - Review scripts, visual relevance, music licensing, subtitles, and the final video before uploading.
 - The sample uses `hi-IN` as a language hint; choose a voice actually available in your configured TTS provider.
 - Keep local audio paths relative to the manifest location, as the CLI resolves manifest-relative media paths.
+
+
+## 4. Apply a Hindi channel content profile
+
+Phase 2 adds reusable prompt profiles for four content pillars: devotional, mythology, motivation, and Shayari. These profiles guide the existing script-generation workflow; they do not bypass the configured language model or guarantee factual accuracy.
+
+Apply a profile to a copy of your calendar:
+
+```bash
+python automation/apply_content_profile.py automation/examples/hindi_youtube_calendar.csv --profile devotional
+```
+
+Other profile names: `mythology`, `motivation`, and `shayari`. The output is a new CSV file with the profile prompt appended to each row's `video_script_prompt`; existing row-specific instructions are preserved.
+
+Then create the batch manifest from the enriched CSV:
+
+```bash
+python automation/content_calendar_to_batch.py automation/examples/hindi_youtube_calendar.devotional.csv
+```
+
+You can choose an explicit output path with `-o`. The catalog lives in [content_profiles.json](content_profiles.json), and the applicator is [apply_content_profile.py](apply_content_profile.py).
+
+## 5. Existing native capabilities discovered in MoneyPrinterTurbo
+
+The repository already includes script generation, platform-specific social metadata generation, and Upload-Post cross-posting (including YouTube configuration). Phase 2 will extend and orchestrate these existing capabilities rather than build duplicate services. Account credentials must be configured by the user. Keep uploads disabled until the video, audience declaration, privacy, synthetic-media disclosure, and metadata have been reviewed.
