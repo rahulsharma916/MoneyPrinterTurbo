@@ -57,7 +57,7 @@ def prepare_calendar(source: Path, destination: Path, channel: str, profile: dic
                  "Write narration with concrete, scene-friendly details and a clear visual progression. "
                  "Do not invent facts, quotations, or attributions.")
         if brief not in existing:
-            row["custom_system_prompt"] = f"{existing}\\n\\n{brief}".strip()
+            row["custom_system_prompt"] = f"{existing}\n\n{brief}".strip()
     for field in ("video_language", "voice_name", "voice_rate", "voice_volume", "subtitle_enabled", "video_aspect", "custom_system_prompt"):
         if field not in fields:
             fields.append(field)
@@ -76,7 +76,7 @@ def main() -> int:
     args = parser.parse_args()
     try:
         profile = load_channel(args.config, args.channel)
-        output = args.output or args.csv_file.with_name(f"{args.csv_file.stem}.{args.channel}.production.csv")
+        output = args.output or args.csv_file.with_name(f"{args.csv_file.stem}.production.csv")
         count = prepare_calendar(args.csv_file, output, args.channel, profile)
         print(f"Prepared {count} {args.channel} task(s): {output}")
         print("Next: run content_calendar_to_batch.py on this prepared CSV.")
