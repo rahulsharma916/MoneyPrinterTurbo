@@ -23,8 +23,8 @@ python automation/prepare_channel_calendar.py automation/examples/motivational_c
 Each command creates a separate production CSV. Convert each prepared CSV into its own batch manifest:
 
 ```bash
-python automation/content_calendar_to_batch.py automation/examples/devotional_channel_calendar.devotional.devotional.production.csv
-python automation/content_calendar_to_batch.py automation/examples/motivational_channel_calendar.motivation.motivation.production.csv
+python automation/content_calendar_to_batch.py automation/examples/devotional_channel_calendar.devotional.production.csv
+python automation/content_calendar_to_batch.py automation/examples/motivational_channel_calendar.motivation.production.csv
 ```
 
 Run the resulting manifests with the existing CLI only after reviewing them. Validate with:
