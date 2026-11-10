@@ -1,63 +1,80 @@
 # YouTube Content Calendar Automation
 
-This first integration milestone adds a small, dependency-free utility that converts a CSV content calendar into a batch manifest accepted by MoneyPrinterTurbo's existing CLI. It does not modify the video-generation engine and does not upload or publish anything.
+This utility converts a UTF-8 CSV content calendar into a validated batch manifest for MoneyPrinterTurbo. The channel profiles are deliberately separated: use one calendar and one profile per YouTube channel.
 
-## 1. Prepare your calendar
+## Two independent channel workflows
 
-Start from [examples/hindi_youtube_calendar.csv](examples/hindi_youtube_calendar.csv). One row is one video. Keep the CSV in UTF-8 encoding.
+| Channel | Profile key | Content boundary | Example calendar |
+|---|---|---|---|
+| Devotional | `devotional` | Bhakti, Hindu deities, epics, mythology, spiritual reflections | [devotional_channel_calendar.csv](examples/devotional_channel_calendar.csv) |
+| Motivational | `motivation` | Motivational stories, discipline, mindset, life lessons, original motivational Shayari | [motivational_channel_calendar.csv](examples/motivational_channel_calendar.csv) |
 
-Required per row: either `video_subject` or `video_script`.
+Keep each channel's brand name, logo, voice, thumbnail style, descriptions, playlists, upload defaults, and analytics separate. Do not mix devotional topics into the motivational channel or vice versa. Mythology is part of the devotional channel when it is framed as devotional/epic storytelling.
 
-Useful columns:
-
-| Column | Purpose | Example |
-| --- | --- | --- |
-| `video_subject` | Topic / subject | `हनुमान जी से मिलने वाली 5 सीख` |
-| `video_script` | Ready narration script (optional) | Hindi script text |
-| `video_aspect` | Output ratio | `9:16` Shorts, `16:9` long-form |
-| `video_language` | Language / TTS locale | `hi-IN` |
-| `video_clip_duration` | Target stock clip duration in seconds | `4` |
-| `video_count` | Variations to generate | `1` |
-| `voice_name` | Configured TTS voice | Leave blank to use app defaults |
-| `bgm_type` | Background music setting | `random` |
-| `subtitle_enabled` | Enable subtitles | `true` / `false` |
-| `video_source` | Material provider | `pexels` |
-
-Additional supported columns are the corresponding scalar fields from `VideoParams`: `video_terms` (separate terms with semicolons), `video_fit_mode`, `image_motion`, `video_concat_mode`, `video_transition_mode`, `video_clip_speed`, `match_materials_to_script`, `custom_audio_file`, `voice_volume`, `voice_rate`, `bgm_file`, `bgm_volume`, subtitle styling fields, `paragraph_number`, `video_script_prompt`, and `custom_system_prompt`. Unknown columns are rejected to prevent silent typos.
-
-## 2. Generate and validate the manifest
+## 1. Apply the correct channel profile
 
 From the repository root:
 
 ```bash
-python automation/content_calendar_to_batch.py automation/examples/hindi_youtube_calendar.csv
+python automation/apply_content_profile.py automation/examples/devotional_channel_calendar.csv --profile devotional
+python automation/apply_content_profile.py automation/examples/motivational_channel_calendar.csv --profile motivation
 ```
 
-Validate without writing a file:
+Each command creates a new CSV with the selected channel prompt appended to each row's `video_script_prompt`. Existing row-specific instructions are preserved. The original CSV is not overwritten.
+
+## 2. Generate batch manifests separately
 
 ```bash
-python automation/content_calendar_to_batch.py automation/examples/hindi_youtube_calendar.csv --check
+python automation/content_calendar_to_batch.py automation/examples/devotional_channel_calendar.devotional.csv
+python automation/content_calendar_to_batch.py automation/examples/motivational_channel_calendar.motivation.csv
 ```
 
-By default, the tool writes a UTF-8 JSONL file beside the CSV. To create a JSON array instead:
+This creates a separate JSONL manifest beside each enriched CSV. Review the files before generation.
+
+## 3. Generate videos
 
 ```bash
-python automation/content_calendar_to_batch.py automation/examples/hindi_youtube_calendar.csv --format json
+python cli.py --batch-file automation/examples/devotional_channel_calendar.devotional.jsonl
+python cli.py --batch-file automation/examples/motivational_channel_calendar.motivation.jsonl
 ```
 
-## 3. Generate videos with MoneyPrinterTurbo
+The CLI's configured providers, API credentials, and voice settings apply. Confirm that the selected Hindi voice is available from your configured TTS provider.
 
-Review the generated manifest, confirm API keys / providers / voice configuration in `config.toml`, then run:
+## 4. Calendar columns
+
+Required per row: either `video_subject` or `video_script`.
+
+| Column | Purpose | Example |
+|---|---|---|
+| `video_subject` | Video topic | Hindi topic |
+| `video_script` | Ready narration script (optional) | Hindi script |
+| `video_aspect` | Output ratio | `9:16` Shorts, `16:9` long-form |
+| `video_language` | Language / TTS locale | `hi-IN` |
+| `video_clip_duration` | Target stock clip duration | `4` |
+| `video_count` | Variations | `1` |
+| `voice_name` | Configured TTS voice | Leave blank for app default |
+| `bgm_type` | Background music | `random` |
+| `subtitle_enabled` | Subtitles | `true` / `false` |
+| `video_source` | Material provider | `pexels` |
+
+The batch generator also accepts supported scalar `VideoParams` fields such as `video_terms`, `video_fit_mode`, `image_motion`, `video_concat_mode`, `video_transition_mode`, `video_clip_speed`, `match_materials_to_script`, `custom_audio_file`, `voice_volume`, `voice_rate`, `bgm_file`, `bgm_volume`, subtitle styling fields, `paragraph_number`, `video_script_prompt`, and `custom_system_prompt`. Unknown columns are rejected.
+
+## 5. Validate without writing
 
 ```bash
-python cli.py --batch-file automation/examples/hindi_youtube_calendar.jsonl
+python automation/content_calendar_to_batch.py automation/examples/devotional_channel_calendar.devotional.csv --check
+python automation/content_calendar_to_batch.py automation/examples/motivational_channel_calendar.motivation.csv --check
 ```
 
-The CLI's own generation settings and provider credentials still apply. The generator enforces the current CLI manifest limits (100 tasks and 1 MiB) and validates basic types and enumerated values before writing.
+The CLI batch manifest limit is 100 tasks and 1 MiB. The generator checks these limits and basic field types before writing.
 
-## Important safeguards
+## Existing native capabilities and safeguards
 
-- No automatic publishing, scheduling, or YouTube account connection is performed by this utility.
-- Review scripts, visual relevance, music licensing, subtitles, and the final video before uploading.
-- The sample uses `hi-IN` as a language hint; choose a voice actually available in your configured TTS provider.
-- Keep local audio paths relative to the manifest location, as the CLI resolves manifest-relative media paths.
+MoneyPrinterTurbo already contains script generation, social metadata generation, and Upload-Post cross-posting including YouTube settings. Phase 2 should orchestrate these existing capabilities, not duplicate them.
+
+- The profile applicator prepares prompts; it does not call an AI model by itself.
+- This workflow does not publish or schedule uploads automatically.
+- Configure each channel's YouTube account/destination and publishing settings separately in the relevant publishing service.
+- Keep uploads disabled until you review the video, title, description, tags, audience declaration, synthetic-media disclosure, and privacy.
+- Review script accuracy, visual relevance, music licensing, and subtitles before publishing.
+- Never assume a default TTS voice is suitable; verify it is configured and pronounce Hindi correctly.

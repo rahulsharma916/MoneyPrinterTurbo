@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "profiles": {
+    "devotional": {
+      "label": "Devotional channel",
+      "language": "Hindi",
+      "prompt": "CHANNEL IDENTITY: Hindi devotional and spiritual storytelling. This channel covers bhakti, devotional reflections, Hindu deities, epics, Puranic stories, and mythology including traditional characters such as Hanuman, Krishna, Shiva, and Barbarik. Write respectful, emotionally engaging Hindi narration with a strong opening hook, clear scene progression, and a meaningful spiritual takeaway. Use simple spoken Hindi. Keep claims about scripture, rituals, history, and miracles accurate; never invent quotations, shlokas, dates, or references. Clearly distinguish popular belief and regional tradition from verified scriptural accounts; note when traditions vary. Avoid fear, threats, guaranteed blessings, manipulative claims, and sensational misinformation. Do not include motivational self-help topics unrelated to devotional storytelling. End with a sincere reflection and gentle channel call to action."
+    },
+    "motivation": {
+      "label": "Motivational channel",
+      "language": "Hindi",
+      "prompt": "CHANNEL IDENTITY: Hindi motivation, personal growth, resilience, discipline, mindset, life lessons, and original motivational stories. Write an original, emotionally engaging Hindi script for spoken narration. Open with a compelling hook; use relatable situations, concrete details, escalating tension, a turning point, and a practical takeaway. Vary formats across short motivational stories, life lessons, reflective monologues, and original motivational Shayari when requested. Do not invent quotes or attribute invented stories to real people. Avoid guaranteed success, medical or financial promises, generic filler, and preachy language. Keep the tone encouraging, grounded, human, and actionable. Do not include devotional prayers, deity stories, scripture, or religious claims; those belong to the separate devotional channel. Close with one concise call to action aligned to the channel."
+    }
+  }
+}
