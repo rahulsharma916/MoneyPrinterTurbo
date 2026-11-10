@@ -2,24 +2,14 @@
   "version": 1,
   "profiles": {
     "devotional": {
-      "label": "Hindi devotional",
+      "label": "Devotional channel",
       "language": "Hindi",
-      "prompt": "Write a respectful, emotionally engaging Hindi devotional video script. Open with a strong curiosity or devotion-led hook in the first sentence. Use simple spoken Hindi, natural narration, and a clear beginning, middle, and ending. Keep claims about scripture, rituals, history, and miracles accurate; do not invent quotations, shlokas, dates, or scriptural references. Clearly distinguish a popular belief or regional tradition from a verified scriptural account. Avoid fear, threats, guaranteed blessings, or manipulative claims. End with a sincere reflection and a gentle invitation to like, subscribe, or share."
-    },
-    "mythology": {
-      "label": "Hindi mythology and epics",
-      "language": "Hindi",
-      "prompt": "Create a compelling Hindi mythology story for narration. Begin with a high-retention hook, establish the character and stakes quickly, then unfold the story in vivid but concise scenes and finish with a meaningful takeaway. Use respectful language. Do not fabricate scripture quotations or present disputed regional versions as universally established fact. Where versions differ, say that traditions vary. Avoid modern political claims and sensational misinformation. Write for spoken delivery, not as an essay."
+      "prompt": "CHANNEL IDENTITY: Hindi devotional and spiritual storytelling. This channel covers bhakti, devotional reflections, Hindu deities, epics, Puranic stories, and mythology including traditional characters such as Hanuman, Krishna, Shiva, and Barbarik. Write respectful, emotionally engaging Hindi narration with a strong opening hook, clear scene progression, and a meaningful spiritual takeaway. Use simple spoken Hindi. Keep claims about scripture, rituals, history, and miracles accurate; never invent quotations, shlokas, dates, or references. Clearly distinguish popular belief and regional tradition from verified scriptural accounts; note when traditions vary. Avoid fear, threats, guaranteed blessings, manipulative claims, and sensational misinformation. Do not include motivational self-help topics unrelated to devotional storytelling. End with a sincere reflection and gentle channel call to action."
     },
     "motivation": {
-      "label": "Hindi motivational stories",
+      "label": "Motivational channel",
       "language": "Hindi",
-      "prompt": "Write an original Hindi motivational story with a relatable protagonist, a clear challenge, escalating tension, a turning point, and a memorable resolution. Use conversational spoken Hindi and concrete details rather than generic slogans. Do not attribute invented quotes or stories to real people. Avoid guaranteed success or medical/financial claims. Deliver one practical lesson viewers can apply today. Start with a compelling hook and close with a concise, uplifting call to action."
-    },
-    "shayari": {
-      "label": "Hindi Shayari",
-      "language": "Hindi",
-      "prompt": "Write original Hindi/Urdu-influenced Shayari suitable for expressive voiceover. Use natural, emotionally resonant language, rhythm, imagery, and a memorable opening line. Keep the piece coherent around one emotion or theme; avoid clichéd filler and awkward forced rhymes. Do not imitate or reproduce a living poet's distinctive style or quote copyrighted verses. End with a strong final couplet or thought. Add brief narration pauses only where they improve delivery."
+      "prompt": "CHANNEL IDENTITY: Hindi motivation, personal growth, resilience, discipline, mindset, life lessons, and original motivational stories. Write an original, emotionally engaging Hindi script for spoken narration. Open with a compelling hook; use relatable situations, concrete details, escalating tension, a turning point, and a practical takeaway. Vary formats across short motivational stories, life lessons, reflective monologues, and original motivational Shayari when requested. Do not invent quotes or attribute invented stories to real people. Avoid guaranteed success, medical or financial promises, generic filler, and preachy language. Keep the tone encouraging, grounded, human, and actionable. Do not include devotional prayers, deity stories, scripture, or religious claims; those belong to the separate devotional channel. Close with one concise call to action aligned to the channel."
     }
   }
 }
