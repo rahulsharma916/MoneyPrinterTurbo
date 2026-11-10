@@ -25,10 +25,10 @@ class ContentProfileTests(unittest.TestCase):
             self.assertIn("Keep it under 60 seconds.", row["video_script_prompt"])
             self.assertIn("Write respectful Hindi narration.", row["video_script_prompt"])
 
-    def test_profile_catalog_has_four_profiles(self):
+    def test_profile_catalog_has_two_separate_channels(self):
         catalog = Path(__file__).parents[1] / "content_profiles.json"
         data = json.loads(catalog.read_text(encoding="utf-8"))
-        self.assertEqual(set(data["profiles"]), {"devotional", "mythology", "motivation", "shayari"})
+        self.assertEqual(set(data["profiles"]), {"devotional", "motivation"})
         for profile in data["profiles"].values():
             self.assertTrue(profile["prompt"].strip())
 
