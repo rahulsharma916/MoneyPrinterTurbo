@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "profiles": {
+    "devotional": {
+      "label": "Hindi devotional",
+      "language": "Hindi",
+      "prompt": "Write a respectful, emotionally engaging Hindi devotional video script. Open with a strong curiosity or devotion-led hook in the first sentence. Use simple spoken Hindi, natural narration, and a clear beginning, middle, and ending. Keep claims about scripture, rituals, history, and miracles accurate; do not invent quotations, shlokas, dates, or scriptural references. Clearly distinguish a popular belief or regional tradition from a verified scriptural account. Avoid fear, threats, guaranteed blessings, or manipulative claims. End with a sincere reflection and a gentle invitation to like, subscribe, or share."
+    },
+    "mythology": {
+      "label": "Hindi mythology and epics",
+      "language": "Hindi",
+      "prompt": "Create a compelling Hindi mythology story for narration. Begin with a high-retention hook, establish the character and stakes quickly, then unfold the story in vivid but concise scenes and finish with a meaningful takeaway. Use respectful language. Do not fabricate scripture quotations or present disputed regional versions as universally established fact. Where versions differ, say that traditions vary. Avoid modern political claims and sensational misinformation. Write for spoken delivery, not as an essay."
+    },
+    "motivation": {
+      "label": "Hindi motivational stories",
+      "language": "Hindi",
+      "prompt": "Write an original Hindi motivational story with a relatable protagonist, a clear challenge, escalating tension, a turning point, and a memorable resolution. Use conversational spoken Hindi and concrete details rather than generic slogans. Do not attribute invented quotes or stories to real people. Avoid guaranteed success or medical/financial claims. Deliver one practical lesson viewers can apply today. Start with a compelling hook and close with a concise, uplifting call to action."
+    },
+    "shayari": {
+      "label": "Hindi Shayari",
+      "language": "Hindi",
+      "prompt": "Write original Hindi/Urdu-influenced Shayari suitable for expressive voiceover. Use natural, emotionally resonant language, rhythm, imagery, and a memorable opening line. Keep the piece coherent around one emotion or theme; avoid clichéd filler and awkward forced rhymes. Do not imitate or reproduce a living poet's distinctive style or quote copyrighted verses. End with a strong final couplet or thought. Add brief narration pauses only where they improve delivery."
+    }
+  }
+}
