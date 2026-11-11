@@ -127,13 +127,16 @@ def _get_json(url: str, access_token: str) -> dict[str, Any]:
     return result
 
 def verify_channel(access_token: str, expected_channel_id: str) -> dict[str, str]:
-    query = urllib.parse.urlencode({"part": "id,snippet", "mine": "true"})
-    response = _get_json(f"{API_ROOT}/youtube/v3/channels?{query}", access_token); items = response.get("items") or []
-    if len(items) != 1: raise RuntimeError("Could not identify exactly one YouTube channel for this Google account")
-    item = items[0]; actual_id = item.get("id", "")
-    if actual_id != expected_channel_id: raise RuntimeError(f"Channel identity mismatch: configured {expected_channel_id}, authenticated {actual_id}. No analytics were fetched.")
-    return {"channel_id": actual_id, "title": str(item.get("snippet", {}).get("title") or "")}
-
+    query = urllib.parse.urlencode({"part": "id,snippet", "mine": "true", "maxResults": "50"})
+    response = _get_json(f"{API_ROOT}/youtube/v3/channels?{query}", access_token)
+    items = response.get("items") or []
+    match = next((item for item in items if item.get("id") == expected_channel_id), None)
+    if match is None:
+        raise RuntimeError(
+            f"Configured channel {expected_channel_id} is not available to the authenticated Google account. "
+            "No analytics were fetched. Sign in with an account that manages this channel."
+        )
+    return {"channel_id": expected_channel_id, "title": str(match.get("snippet", {}).get("title") or "")}
 def query_report(access_token: str, start: str, end: str, metrics: str, **extra: str) -> dict[str, Any]:
     params = {"ids": "channel==MINE", "startDate": start, "endDate": end, "metrics": metrics, **extra}
     return _get_json(f"{API_ROOT}/youtube/analytics/v2/reports?" + urllib.parse.urlencode(params), access_token)
