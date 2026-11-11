@@ -118,7 +118,7 @@ def validate_approved_package(
     if not video_path.is_file():
         raise ValueError(f"final video file does not exist: {video_path}")
 
-    account = load_channel_account(channel, config_path=config_path)
+    account = load_channel_account(channel, config_path=config_path, environ=environ)
     if manifest.get("publishing_account_env") != _channel_account_env(config_path, channel):
         raise ValueError("manifest publishing account does not match the selected channel configuration")
     if workflow.get("execution_attempt") is not None:
