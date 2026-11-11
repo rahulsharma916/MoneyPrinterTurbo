@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import tempfile
 import uuid
@@ -70,6 +71,7 @@ def validate_approved_package(
     manifest_path: Path,
     channel: str,
     config_path: Path,
+    environ=None,
 ) -> tuple[dict[str, Any], Path]:
     if manifest.get("channel") != channel:
         raise ValueError("manifest channel does not match --channel")
@@ -147,7 +149,7 @@ def publish_approved_package(
     environ=None,
 ) -> dict[str, Any]:
     manifest = _read_manifest(manifest_path)
-    account, video_path = validate_approved_package(manifest, manifest_path, channel, config_path)
+    account, video_path = validate_approved_package(manifest, manifest_path, channel, config_path, environ=environ)
     if not execute:
         return {"ready": True, "executed": False, "channel": channel, "video_file": str(video_path)}
     if not confirm_upload:
