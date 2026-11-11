@@ -457,28 +457,28 @@ This step retrieves performance reports independently for the devotional and mot
 1. In Google Cloud Console, create or select a project and enable **YouTube Analytics API** and **YouTube Data API v3**.
 2. Configure the OAuth consent screen for your use case and create an OAuth client of type **Desktop app**.
 3. Download the OAuth client JSON to a private local folder. Never commit it or paste its contents into chat.
-4. Set each channel's \`youtube_channel_id\` in \`automation/channel_configs.json\` after verifying the channel ID in YouTube Studio.
+4. Set each channel's `youtube_channel_id` in `automation/channel_configs.json` after verifying the channel ID in YouTube Studio.
 5. Set the relevant environment variable. Example (Linux/macOS):
-   \`\`\`bash
+   ```bash
    export MPT_DEVOTIONAL_GOOGLE_OAUTH_CLIENT_SECRETS="$HOME/.config/mpt/google-devotional-client.json"
    export MPT_MOTIVATION_GOOGLE_OAUTH_CLIENT_SECRETS="$HOME/.config/mpt/google-motivation-client.json"
-   \`\`\`
+   ```
    Use separate OAuth clients or explicitly authorize the correct Google account for each channel. The script verifies the authenticated channel ID before requesting Analytics data.
 
 ### Run a report
 
-\`\`\`bash
+```bash
 python automation/youtube_analytics_readonly.py --channel devotional
 python automation/youtube_analytics_readonly.py --channel motivation
-\`\`\`
+```
 
 The default date range is the last 28 complete days (ending yesterday). Specify a range and output path when required:
 
-\`\`\`bash
+```bash
 python automation/youtube_analytics_readonly.py --channel devotional --start-date 2026-10-01 --end-date 2026-10-31 --output storage/analytics/devotional_october.json
-\`\`\`
+```
 
-On first run, a browser opens for Google OAuth consent. Only \`youtube.readonly\` and \`yt-analytics.readonly\` scopes are requested. Access and refresh tokens are stored separately under \`~/.config/mpt/youtube-analytics/{channel}.json\` with restrictive file permissions where supported. Use \`--reauthorize\` to repeat consent. Keep OAuth client JSON and token files outside the repository.
+On first run, a browser opens for Google OAuth consent. Only `youtube.readonly` and `yt-analytics.readonly` scopes are requested. Access and refresh tokens are stored separately under `~/.config/mpt/youtube-analytics/{channel}.json` with restrictive file permissions where supported. Use `--reauthorize` to repeat consent. Keep OAuth client JSON and token files outside the repository.
 
 ### Included reports
 
@@ -494,11 +494,11 @@ Thumbnail impressions and CTR are intentionally not claimed in this first target
 - Read-only OAuth scopes only; no write or upload scopes.
 - Channel ID is checked against the authenticated account before Analytics requests run.
 - Separate token files per channel; OAuth client JSON and tokens remain outside the repository.
-- \`upload_enabled\` remains false and human publishing approval is unchanged.
+- `upload_enabled` remains false and human publishing approval is unchanged.
 - Treat generated reports as private channel performance data.
 
 Validate helper functions without making Google API calls:
 
-\`\`\`bash
+```bash
 python -m unittest automation.tests.test_youtube_analytics_readonly
-\`\`\`
+```
