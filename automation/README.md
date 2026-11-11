@@ -293,3 +293,37 @@ python -m unittest automation.tests.test_validate_rendered_video
 ```
 
 **Quality boundary:** this is a technical file-integrity gate, not an editorial review. It cannot judge whether the images match the narration, whether scene cuts feel natural, whether the Hindi pronunciation is correct, whether the audio sounds clean, or whether subtitles are actually burned into the picture. Watch and listen to the complete MP4 before publishing. The tool does not upload or schedule content.
+
+
+## YouTube publishing approval package (Phase 6 — Step 1)
+
+Create a review-only publishing manifest after the final MP4 and thumbnail have been rendered and checked. The tool keeps the devotional and motivational channels separate and does not upload or schedule content.
+
+Example for the devotional channel:
+
+```bash
+python automation/prepare_youtube_publishing_package.py \
+  --channel devotional \
+  --assets path/to/hanuman.assets.json \
+  --video path/to/final-1.mp4 \
+  --thumbnail path/to/thumbnail.png \
+  --made-for-kids no \
+  --synthetic-media yes
+```
+
+For the motivational channel, use `--channel motivation` and that channel's own asset package. The audience and synthetic-media answers are mandatory per-video inputs; review the actual content before choosing them. Do not assume every video has the same audience classification.
+
+The output defaults to the video filename with `.publishing.json` appended in place of its extension. It contains:
+- Channel identity and channel-specific Upload-Post account environment-variable *name* (never credentials).
+- Final video and optional thumbnail paths, title, description, tags, hashtags and configured privacy status.
+- Explicit per-video audience and synthetic-media declarations.
+- A pending-human-review checklist covering the final video, thumbnail, metadata, music/copyright, audience, synthetic-media disclosure and destination account.
+- Approval fields left blank, `upload_authorized=false`, and the channel upload configuration still required to be disabled.
+
+The utility refuses cross-channel asset packages, missing media files, invalid YouTube metadata and channel configurations that enable uploads. It does not change channel configuration, read environment variables or API keys, call Upload-Post, publish, or schedule. A human must review and approve the package in a future, separately implemented publishing step.
+
+Run tests:
+
+```bash
+python -m unittest automation.tests.test_prepare_youtube_publishing_package
+```
