@@ -71,9 +71,10 @@ def validate(data: object) -> list[str]:
                 errors.append(f"{key}: privacy_status must be private, unlisted or public")
             if publishing.get("made_for_kids") not in (True, False, None):
                 errors.append(f"{key}: made_for_kids must be true, false or null (review required)")
-            env_name = publishing.get("upload_post_account_env")
-            if not isinstance(env_name, str) or not env_name.startswith("MPT_"):
-                errors.append(f"{key}: use an environment-variable name for the publishing account")
+            for field in ("upload_post_api_key_env", "upload_post_account_env"):
+                env_name = publishing.get(field)
+                if not isinstance(env_name, str) or not env_name.startswith("MPT_"):
+                    errors.append(f"{key}: {field} must be an environment-variable name")
     return errors
 
 

@@ -11,7 +11,7 @@ This utility converts a UTF-8 CSV content calendar into a validated batch manife
 
 Keep each channel's brand name, logo, voice, thumbnail style, descriptions, playlists, upload defaults, and analytics separate. Do not mix devotional topics into the motivational channel or vice versa. Mythology is part of the devotional channel when it is framed as devotional/epic storytelling.
 
-## Channel configuration (Phase 3)\n\n`channel_configs.json` stores independent identity and production defaults for the two channels: language, Shorts/long-form aspect ratios, voice overrides, creative direction, thumbnail direction, music guidance, SEO defaults, and publishing safeguards. The file contains no credentials. Configure actual channel IDs and voice names only after confirming the correct accounts and provider voices.\n\nValidate the configuration from the repository root:\n\n```bash\npython automation/validate_channel_configs.py\npython -m unittest automation.tests.test_channel_configs\n```\n\nBoth channels intentionally start with publishing disabled, private visibility, mandatory human approval, and an unset `made_for_kids` declaration. Do not change the audience declaration without reviewing the actual video. The account environment-variable names are placeholders; they are not connected to the existing Upload-Post integration yet.\n\n## Channel-aware production preparation (Phase 4)
+## Channel configuration (Phase 3)\n\n`channel_configs.json` stores independent identity and production defaults for the two channels: language, Shorts/long-form aspect ratios, voice overrides, creative direction, thumbnail direction, music guidance, SEO defaults, and publishing safeguards. The file contains no credentials. Configure actual channel IDs and voice names only after confirming the correct accounts and provider voices.\n\nValidate the configuration from the repository root:\n\n```bash\npython automation/validate_channel_configs.py\npython -m unittest automation.tests.test_channel_configs\n```\n\nBoth channels intentionally start with publishing disabled, private visibility, mandatory human approval, and an unset `made_for_kids` declaration. Do not change the audience declaration without reviewing the actual video. The account environment-variable names are consumed by the Phase 6 Step 2 local credential validator. They are not yet wired into an upload action; publishing remains disabled.\n\n## Channel-aware production preparation (Phase 4)
 
 After applying the content profile, apply the channel's production defaults to the enriched calendar. Non-empty row-level values take priority over channel defaults.
 
@@ -327,3 +327,34 @@ Run tests:
 ```bash
 python -m unittest automation.tests.test_prepare_youtube_publishing_package
 ```
+
+
+## Secure channel publishing credentials (Phase 6 — Step 2)
+
+The two channels use separate Upload-Post API-key and account-username environment variables. Do not put credential values in `channel_configs.json`, CSV files, JSON manifests, source code, screenshots, or Git commits.
+
+Environment-variable names are declared per channel in `channel_configs.json`:
+- Devotional: `MPT_DEVOTIONAL_UPLOAD_POST_API_KEY` and `MPT_DEVOTIONAL_UPLOAD_POST_USERNAME`
+- Motivation: `MPT_MOTIVATION_UPLOAD_POST_API_KEY` and `MPT_MOTIVATION_UPLOAD_POST_USERNAME`
+
+Set the values in the private environment of the machine/container that runs MoneyPrinterTurbo. For a temporary local shell session, for example:
+
+```bash
+export MPT_DEVOTIONAL_UPLOAD_POST_API_KEY="your-devotional-api-key"
+export MPT_DEVOTIONAL_UPLOAD_POST_USERNAME="your-devotional-upload-post-username"
+export MPT_MOTIVATION_UPLOAD_POST_API_KEY="your-motivation-api-key"
+export MPT_MOTIVATION_UPLOAD_POST_USERNAME="your-motivation-upload-post-username"
+```
+
+Do not paste real values into chat or commit them. Use your deployment platform's secret manager for persistent deployment, with access limited to the publishing runtime.
+
+Validate each channel independently without printing credentials or contacting Upload-Post:
+
+```bash
+python automation/validate_channel_upload_accounts.py --channel devotional
+python automation/validate_channel_upload_accounts.py --channel motivation
+```
+
+The resolver returns an in-memory account snapshot compatible with the existing `UploadPostService(account=...)` interface. It refuses missing credentials, malformed environment-variable names, reused key/username variable names, or a channel configuration with uploads enabled. The CLI reports presence only.
+
+**Scope boundary:** this step validates local secret presence and account separation; it does not authenticate against Upload-Post, confirm the remote account's connected YouTube channel, modify the existing upload pipeline, or enable publishing. The actual YouTube destination must be confirmed in the Upload-Post dashboard before any future upload integration. Uploads remain disabled and require human approval.
