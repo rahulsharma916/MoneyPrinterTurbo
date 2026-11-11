@@ -127,3 +127,36 @@ python -m unittest automation.tests.test_generate_content_assets
 ```
 
 **Scope boundary:** this step generates creative prompts and metadata only. It does not render image files, compose a thumbnail image, generate a video, or upload/schedule content. Use the image prompts with a separately configured image provider or approved image-generation workflow. Review every generated scene for script accuracy, cultural sensitivity, licensing, and visual consistency. Review SEO copy for factual accuracy before publishing. Public uploads remain disabled and require human approval.
+
+
+## Scene image rendering (Phase 5 — Step 2)
+
+After generating and reviewing a Phase 5 asset package, you can render a small set of scene illustrations and an optional thumbnail using the repository's Codex image adapter.
+
+First run a dry-run plan (no image requests are made):
+
+```bash
+python automation/render_scene_images.py path/to/hanuman_script.devotional.assets.json --max-scene-images 3 --include-thumbnail
+```
+
+Actual rendering is deliberately opt-in. Configure and authorize the Codex image provider in MoneyPrinterTurbo, then add `--execute`:
+
+```bash
+python automation/render_scene_images.py path/to/hanuman_script.devotional.assets.json --max-scene-images 3 --include-thumbnail --execute
+```
+
+For motivational assets, pass that channel's generated JSON package instead. The tool:
+- Uses the existing Codex image authorization and image-generation adapter; it does not store credentials in files.
+- Processes requests sequentially and caps scene generation at 12 images per run, plus one optional thumbnail.
+- Skips existing output files, validates returned PNG files, and writes an `image_manifest.json` with per-image status.
+- Stops on an image-provider error and does not automatically retry a request whose billing outcome may be uncertain.
+
+Image-generation access, quotas, and any associated usage charges depend on the configured Codex account and current provider terms. Review those before using `--execute`. A dry run does not require image-provider authorization.
+
+Test the input validation and dry-run planner:
+
+```bash
+python -m unittest automation.tests.test_render_scene_images
+```
+
+This step creates individual PNG assets; it does not assemble a finished video or guarantee visual consistency across scenes. Review the images, add any required continuity corrections, and compose the final video/thumbnail in a separate step. Keep public uploads disabled pending human review.
