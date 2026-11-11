@@ -141,7 +141,13 @@ def _evidence_is_current(stage_record: dict[str, Any]) -> bool:
     return True
 
 
+def _ensure_distinct_paths(workflow_path: Path, state_path: Path) -> None:
+    if workflow_path.expanduser().resolve() == state_path.expanduser().resolve():
+        raise ValueError("workflow and checkpoint state must use different file paths")
+
+
 def initialize(workflow_path: Path, state_path: Path) -> dict[str, Any]:
+    _ensure_distinct_paths(workflow_path, state_path)
     workflow, stages, workflow_hash = _load_workflow(workflow_path)
     if state_path.exists():
         raise ValueError(f"state file already exists; use sync or choose another path: {state_path}")
@@ -151,6 +157,7 @@ def initialize(workflow_path: Path, state_path: Path) -> dict[str, Any]:
 
 
 def sync_state(workflow_path: Path, state_path: Path) -> dict[str, Any]:
+    _ensure_distinct_paths(workflow_path, state_path)
     workflow, stages, workflow_hash = _load_workflow(workflow_path)
     state = _load_state(state_path)
     if state["channel"] != workflow["channel"]:
@@ -192,6 +199,7 @@ def sync_state(workflow_path: Path, state_path: Path) -> dict[str, Any]:
 
 def complete_stage(workflow_path: Path, state_path: Path, stage_id: str,
                    evidence_paths: list[Path], reviewed_by: str, note: str | None = None) -> dict[str, Any]:
+    _ensure_distinct_paths(workflow_path, state_path)
     workflow, workflow_stages, workflow_hash = _load_workflow(workflow_path)
     state = _load_state(state_path)
     if state["channel"] != workflow["channel"]:
@@ -277,6 +285,7 @@ def reset_from(state_path: Path, stage_id: str) -> dict[str, Any]:
 
 
 def status_report(workflow_path: Path, state_path: Path) -> dict[str, Any]:
+    _ensure_distinct_paths(workflow_path, state_path)
     workflow, workflow_stages, workflow_hash = _load_workflow(workflow_path)
     state = _load_state(state_path)
     if state["channel"] != workflow["channel"]:
