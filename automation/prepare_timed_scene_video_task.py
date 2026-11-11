@@ -186,6 +186,10 @@ def prepare_timed_video_task(
         raise ValueError("generated video task exceeds the CLI 1 MiB manifest limit")
 
     destination = output_manifest or (local_videos_dir / f"{folder_name}.timed.video.jsonl")
+    try:
+        destination.resolve().relative_to(local_videos_dir.resolve())
+    except ValueError as exc:
+        raise ValueError("output manifest must be inside storage/local_videos so relative inputs resolve safely") from exc
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(payload, encoding="utf-8")
     return destination
