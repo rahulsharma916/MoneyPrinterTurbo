@@ -29,6 +29,10 @@
           "#HindiKatha"
         ]
       },
+      "analytics": {
+        "oauth_client_secrets_env": "MPT_DEVOTIONAL_GOOGLE_OAUTH_CLIENT_SECRETS",
+        "token_storage": "user_config_directory"
+      },
       "publishing": {
         "platform": "youtube",
         "upload_enabled": false,
@@ -67,6 +71,10 @@
           "#LifeLessons",
           "#MotivationalStory"
         ]
+      },
+      "analytics": {
+        "oauth_client_secrets_env": "MPT_MOTIVATION_GOOGLE_OAUTH_CLIENT_SECRETS",
+        "token_storage": "user_config_directory"
       },
       "publishing": {
         "platform": "youtube",

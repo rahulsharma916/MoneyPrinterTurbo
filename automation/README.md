@@ -446,3 +446,59 @@ python -m unittest automation.tests.test_build_publishing_report
 ```
 
 Tests are added but must be run in your environment before relying on the report in production.
+
+
+## YouTube Analytics read-only integration (Phase 6 — Step 5)
+
+This step retrieves performance reports independently for the devotional and motivation channels using Google's YouTube Analytics API and verifies account identity through YouTube Data API. It never uploads, schedules, edits, or deletes content.
+
+### One-time Google Cloud setup
+
+1. In Google Cloud Console, create or select a project and enable **YouTube Analytics API** and **YouTube Data API v3**.
+2. Configure the OAuth consent screen for your use case and create an OAuth client of type **Desktop app**.
+3. Download the OAuth client JSON to a private local folder. Never commit it or paste its contents into chat.
+4. Set each channel's `youtube_channel_id` in `automation/channel_configs.json` after verifying the channel ID in YouTube Studio.
+5. Set the relevant environment variable. Example (Linux/macOS):
+   ```bash
+   export MPT_DEVOTIONAL_GOOGLE_OAUTH_CLIENT_SECRETS="$HOME/.config/mpt/google-devotional-client.json"
+   export MPT_MOTIVATION_GOOGLE_OAUTH_CLIENT_SECRETS="$HOME/.config/mpt/google-motivation-client.json"
+   ```
+   Use separate OAuth clients or explicitly authorize the correct Google account for each channel. The script verifies the authenticated channel ID before requesting Analytics data.
+
+### Run a report
+
+```bash
+python automation/youtube_analytics_readonly.py --channel devotional
+python automation/youtube_analytics_readonly.py --channel motivation
+```
+
+The default date range is the last 28 complete days (ending yesterday). Specify a range and output path when required:
+
+```bash
+python automation/youtube_analytics_readonly.py --channel devotional --start-date 2026-10-01 --end-date 2026-10-31 --output storage/analytics/devotional_october.json
+```
+
+On first run, a browser opens for Google OAuth consent. Only `youtube.readonly` and `yt-analytics.readonly` scopes are requested. Access and refresh tokens are stored separately under `~/.config/mpt/youtube-analytics/{channel}.json` with restrictive file permissions where supported. Use `--reauthorize` to repeat consent. Keep OAuth client JSON and token files outside the repository.
+
+### Included reports
+
+- Daily channel activity: views, engaged views, estimated minutes watched, average view duration/percentage, subscribers gained/lost, likes, comments and shares, split by creator content type where available.
+- Top 50 videos ranked by estimated minutes watched.
+- Traffic-source type breakdown by views and estimated minutes watched.
+- Verified channel identity and requested date range.
+
+Thumbnail impressions and CTR are intentionally not claimed in this first targeted-query integration. Google's documentation lists these in YouTube Reporting API reach reports. Audience-retention curves are deferred to a separately validated report. Analytics data can be delayed or adjusted by YouTube.
+
+### Security and operational boundaries
+
+- Read-only OAuth scopes only; no write or upload scopes.
+- Channel ID is checked against the authenticated account before Analytics requests run.
+- Separate token files per channel; OAuth client JSON and tokens remain outside the repository.
+- `upload_enabled` remains false and human publishing approval is unchanged.
+- Treat generated reports as private channel performance data.
+
+Validate helper functions without making Google API calls:
+
+```bash
+python -m unittest automation.tests.test_youtube_analytics_readonly
+```
