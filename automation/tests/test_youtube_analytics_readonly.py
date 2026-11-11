@@ -3,7 +3,8 @@ import tempfile
 import unittest
 from datetime import date
 from pathlib import Path
-from automation.youtube_analytics_readonly import build_output, default_date_range, load_channel_config, parse_date, rows_as_objects, validate_date_range
+from unittest.mock import patch
+from automation.youtube_analytics_readonly import build_output, default_date_range, load_channel_config, parse_date, rows_as_objects, validate_date_range, verify_channel
 
 class YouTubeAnalyticsReadonlyTests(unittest.TestCase):
     def test_default_range_is_last_28_complete_days(self):
@@ -27,6 +28,20 @@ class YouTubeAnalyticsReadonlyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/"config.json"; path.write_text(json.dumps(config),encoding="utf-8"); result=load_channel_config("motivation",path)
         self.assertEqual(result["channel_id"],"UC1234567890123456789012"); self.assertNotIn("client_secret",result)
+    @patch("automation.youtube_analytics_readonly._get_json")
+    def test_channel_verification_selects_expected_channel_from_multiple(self, get_json):
+        get_json.return_value = {"items": [
+            {"id": "UCOTHER", "snippet": {"title": "Other"}},
+            {"id": "UCEXPECTED", "snippet": {"title": "Expected"}},
+        ]}
+        self.assertEqual(verify_channel("token", "UCEXPECTED"), {"channel_id": "UCEXPECTED", "title": "Expected"})
+
+    @patch("automation.youtube_analytics_readonly._get_json")
+    def test_channel_verification_rejects_wrong_google_account(self, get_json):
+        get_json.return_value = {"items": [{"id": "UCOTHER", "snippet": {"title": "Other"}}]}
+        with self.assertRaisesRegex(RuntimeError, "No analytics were fetched"):
+            verify_channel("token", "UCEXPECTED")
+
     def test_output_marks_read_only_scope_and_limitations(self):
         result=build_output({"channel":"devotional","display_name":"Devotional"},{"channel_id":"UC123","title":"Devotional"},"2026-10-01","2026-10-31",{"daily":[],"top_videos":[],"traffic_sources":[]})
         self.assertIn("read-only",result["scope"]); self.assertTrue(any("impressions" in x.lower() for x in result["limitations"]))
