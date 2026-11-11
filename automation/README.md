@@ -186,7 +186,7 @@ Then run the prepared task:
 python cli.py --batch-file storage/local_videos/hanuman-script-devotional.video.jsonl
 ```
 
-The actual output filename is printed by the preparation command; use that exact path. Use a separate assets package and image manifest for each channel. The existing engine turns each still image into a short moving clip and extends/combines the clips to cover the narration. **This initial integration does not align scene changes to exact narration timestamps**: the images play in order and may repeat to cover long audio. For long-form videos, review the result carefully; timestamp-level scene alignment and per-scene duration control remain future work.
+The actual output filename is printed by the preparation command; use that exact path. Use a separate assets package and image manifest for each channel. The existing engine turns each still image into a short moving clip and extends/combines the clips to cover the narration. **This initial integration does not align scene changes to exact narration timestamps**: the images play in order and may repeat to cover long audio. For long-form videos, review the result carefully; this Step 3 workflow does not align scene changes to narration timestamps. Use the Phase 5 Step 5 timed-scene preparation below when you have an approved SRT-based timeline.
 
 Run the unit tests with:
 
@@ -222,7 +222,7 @@ Validate with:
 python -m unittest automation.tests.test_build_scene_timeline
 ```
 
-**Important boundary:** this is a timing-analysis and review artifact only. It does not modify the video renderer or automatically apply the timeline to the final MP4 yet. Whisper/SRT recognition differences can affect match confidence, so inspect every scene boundary. The next integration step is to make the renderer consume this approved timeline and use the corresponding image for the exact scene interval.
+**Important boundary:** this is a timing-analysis and review artifact only. It does not modify the video renderer or automatically apply the timeline to the final MP4 yet. Whisper/SRT recognition differences can affect match confidence, so inspect every scene boundary. Phase 5 Step 5 below converts an approved timeline into per-scene timed MP4 clips and a task manifest for the existing renderer.
 
 ## Timed scene video preparation (Phase 5 — Step 5)
 
