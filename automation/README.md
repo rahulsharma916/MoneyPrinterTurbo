@@ -358,3 +358,60 @@ python automation/validate_channel_upload_accounts.py --channel motivation
 The resolver returns an in-memory account snapshot compatible with the existing `UploadPostService(account=...)` interface. It refuses missing credentials, malformed environment-variable names, reused key/username variable names, or a channel configuration with uploads enabled. The CLI reports presence only.
 
 **Scope boundary:** this step validates local secret presence and account separation; it does not authenticate against Upload-Post, confirm the remote account's connected YouTube channel, modify the existing upload pipeline, or enable publishing. The actual YouTube destination must be confirmed in the Upload-Post dashboard before any future upload integration. Uploads remain disabled and require human approval.
+
+
+## Explicitly approved YouTube publishing (Phase 6 — Step 3)
+
+The publishing command is a separate, one-video action. It reuses the existing Upload-Post service but does not turn on global or channel-level auto-upload. Channel configuration must continue to contain `upload_enabled=false`.
+
+### 1. Review and approve the package
+
+Open the `.publishing.json` file created in Step 1. Only after watching the complete MP4 and reviewing the thumbnail, metadata, rights, audience declaration, synthetic-media declaration and destination account:
+
+- Set `workflow.status` to `"approved"`.
+- Set `workflow.upload_authorized` to `true`.
+- Set every item in `workflow.checks` to `true`.
+- Fill `workflow.approval.approved_by` with the responsible human approver.
+- Fill `workflow.approval.approved_at` with an ISO-8601 timestamp.
+- Keep `publishing_account_env` unchanged; it must match the selected channel configuration.
+
+Do not mark the package approved merely to test the command. Choose the audience and synthetic-media declarations based on the actual finished video and applicable YouTube requirements.
+
+### 2. Validate without uploading
+
+Set the selected channel's API key and username in the private runtime environment as documented in Step 2, then run:
+
+```bash
+python automation/publish_approved_youtube_package.py \
+  --channel devotional \
+  --manifest path/to/video.publishing.json
+```
+
+For the motivational channel, use `--channel motivation` and its own manifest and credentials. This default mode makes no network request and does not change the manifest.
+
+### 3. Execute one explicitly approved upload
+
+Only after the dry-run is ready and the correct destination account has been confirmed in Upload-Post, run:
+
+```bash
+python automation/publish_approved_youtube_package.py \
+  --channel devotional \
+  --manifest path/to/video.publishing.json \
+  --execute \
+  --confirm-upload
+```
+
+The command submits only to YouTube, using the approved title, description, tags, privacy, made-for-kids and synthetic-media values. It enables publishing only in a one-shot in-memory account snapshot for this invocation. It writes an execution-attempt record to the manifest before making the network request.
+
+**Duplicate protection:** a manifest with any recorded execution attempt is blocked from another automatic run. If the result is `outcome_unconfirmed`, do not retry; reconcile the request ID in Upload-Post first. A failed or interrupted attempt also requires manual investigation before creating a new approved package.
+
+**Scope and safety:** this command does not schedule a future publication time, publish to other platforms, enable global auto-upload, alter channel configuration, verify that the remote Upload-Post account is connected to the intended YouTube channel, or guarantee successful processing by YouTube. Confirm the connected destination in the provider dashboard. Public visibility is possible only if the human-approved manifest explicitly specifies it; private is the channel default.
+
+Run tests:
+
+```bash
+python -m unittest automation.tests.test_publish_approved_youtube_package
+python -m unittest test.services.test_upload_post_synthetic_media_declaration
+```
+
+These tests are added to the repository; they must be executed in your local/runtime environment before production use.
