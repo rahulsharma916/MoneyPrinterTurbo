@@ -55,7 +55,7 @@ def load_channel_account(
     if missing:
         raise ValueError(f"{channel}: missing required environment variable(s): {', '.join(missing)}")
     return {
-        "upload_post_enabled": True,
+        "upload_post_enabled": False,
         "upload_post_api_key": api_key,
         "upload_post_username": username,
     }
