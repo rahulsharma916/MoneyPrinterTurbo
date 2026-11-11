@@ -99,6 +99,13 @@ class ProductionIntelligenceTests(unittest.TestCase):
         self.assertTrue(json_out.is_file())
         self.assertTrue(csv_out.is_file())
 
+    def test_non_finite_cost_amount_is_rejected(self):
+        state = self._checkpoint("devotional", "state.json")
+        ledger = self.root / "bad-costs.json"
+        ledger.write_text('{"records":[{"channel":"devotional","provider":"x","amount":NaN,"currency":"INR"}]}', encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "finite non-negative"):
+            build_intelligence([state], cost_ledger_path=ledger)
+
     def test_invalid_channel_in_cost_ledger_is_rejected(self):
         state = self._checkpoint("devotional", "state.json")
         ledger = self.root / "bad-costs.json"
