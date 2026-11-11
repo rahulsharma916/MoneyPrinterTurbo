@@ -638,3 +638,35 @@ Run tests:
     python -m unittest automation.tests.test_build_youtube_growth_calendar
 
 The test also verifies that generated production CSV rows are accepted by the existing batch CSV converter.
+
+
+## End-to-end production workflow planner (Phase 6 — Step 9)
+
+Build a channel-specific runbook that connects the existing creative brief, scene-image, narration-timeline, timed-render and publishing-review utilities. Start with the final Hindi narration script:
+
+```bash
+python automation/build_youtube_production_workflow.py \
+  --channel devotional \
+  --subject "हनुमान जी की भक्ति और साहस" \
+  --script path/to/final_hindi_script.txt \
+  --output-dir storage/workflows/devotional \
+  --aspect 16:9
+```
+
+For the motivational channel, use `--channel motivation` and a different output directory. Optional existing artifacts can be supplied with `--assets`, `--image-manifest`, `--subtitles`, `--audio`, `--image-root`, `--timeline`, `--timed-manifest`, `--video`, and `--thumbnail`.
+
+The JSON runbook:
+- Lists the exact repository commands and prerequisites for each stage.
+- Marks downstream stages blocked until the required files exist, then can be regenerated as production progresses.
+- Separates devotional and motivational asset/output paths.
+- Provides an image-render dry-run command and a separate explicit `--execute` command.
+- Requires the exact final narration audio that generated the SRT before timed scene preparation.
+- Keeps publishing at a human-review-only checkpoint.
+
+**Safety boundary:** this is a planner, not an autonomous runner. It does not execute commands or provider calls, render videos, upload, or schedule. The publishing package remains review-only; upload authorization and public visibility remain disabled. Review factual accuracy, cultural sensitivity, visual relevance, licensing, subtitles, audience declaration and synthetic-media disclosure before any publication.
+
+Test:
+
+```bash
+python -m unittest automation.tests.test_build_youtube_production_workflow
+```
