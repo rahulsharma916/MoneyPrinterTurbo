@@ -260,3 +260,36 @@ python -m unittest automation.tests.test_prepare_timed_scene_video_task
 ```
 
 This step prepares timed scene clips and a task manifest; it does not upload or schedule content. The final renderer still applies the engine's standard clip concatenation and safety margin. Inspect the complete MP4, especially scene boundaries and the final narration tail, before publishing. Keep the devotional and motivational asset packages, audio, and manifests separate.
+
+## Final rendered-video quality gate (Phase 5 — Step 6)
+
+After the CLI has produced the final MP4, run a metadata-based quality gate against the exact narration audio:
+
+```bash
+python automation/validate_rendered_video.py \
+  --video-file path/to/final-1.mp4 \
+  --audio-file path/to/final_narration.mp3 \
+  --aspect 16:9 \
+  --report path/to/quality_report.json
+```
+
+For Shorts, use `--aspect 9:16`. The gate uses FFprobe to verify:
+- The final MP4 contains both video and audio streams.
+- Frame dimensions match the requested aspect ratio within a 2% tolerance.
+- The final video covers at least 99.5% of the narration duration by default.
+- The video does not exceed the narration duration by more than 8 seconds by default (the timed-scene workflow adds a short final hold).
+
+Optional controls:
+- `--min-audio-coverage 0.99` adjusts the minimum duration coverage.
+- `--max-extra-seconds 10` adjusts the allowed video tail.
+- `--ffprobe /path/to/ffprobe` selects a specific FFprobe executable.
+
+The command returns exit code 0 and a JSON report when the checks pass; it returns exit code 2 with a clear failure message when a check fails. FFprobe must be installed and available on PATH.
+
+Test the metadata checks with:
+
+```bash
+python -m unittest automation.tests.test_validate_rendered_video
+```
+
+**Quality boundary:** this is a technical file-integrity gate, not an editorial review. It cannot judge whether the images match the narration, whether scene cuts feel natural, whether the Hindi pronunciation is correct, whether the audio sounds clean, or whether subtitles are actually burned into the picture. Watch and listen to the complete MP4 before publishing. The tool does not upload or schedule content.
