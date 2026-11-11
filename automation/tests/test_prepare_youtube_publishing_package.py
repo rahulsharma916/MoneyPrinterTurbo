@@ -77,7 +77,7 @@ class PublishingPackageTests(unittest.TestCase):
             )
 
     def test_channel_uploads_must_remain_disabled(self):
-        config = json.loads(Path(__file__).with_name("channel_configs.json").read_text(encoding="utf-8"))
+        config = json.loads(Path(__file__).resolve().parents[1] / "channel_configs.json".read_text(encoding="utf-8"))
         config["channels"]["devotional"]["publishing"]["upload_enabled"] = True
         altered = self.root / "channels.json"
         altered.write_text(json.dumps(config), encoding="utf-8")
