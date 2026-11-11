@@ -121,6 +121,10 @@ class ProductionCheckpointTrackerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "channel mismatch"):
             status_report(self.workflow_path, self.state_path)
 
+    def test_refuses_to_use_same_path_for_workflow_and_state(self):
+        with self.assertRaisesRegex(ValueError, "different file paths"):
+            initialize(self.workflow_path, self.workflow_path)
+
     def test_workflow_change_requires_sync_before_completion(self):
         self.workflow["subject"] = "updated topic"
         self._write_workflow()
