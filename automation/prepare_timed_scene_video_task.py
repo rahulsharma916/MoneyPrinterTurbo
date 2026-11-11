@@ -8,6 +8,7 @@ The normal MoneyPrinterTurbo CLI then concatenates these clips in scene order.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import re
@@ -36,7 +37,8 @@ def _read_json(path: Path, label: str) -> dict[str, Any]:
 
 def _safe_stem(value: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9_-]+", "-", value).strip("-_")
-    return (cleaned or "timed-scenes")[:72]
+    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()[:10]
+    return f"{(cleaned or 'timed-scenes')[:60]}-{digest}"
 
 
 def _finite_seconds(value: Any, label: str) -> float:
@@ -187,9 +189,10 @@ def prepare_timed_video_task(
 
     destination = output_manifest or (local_videos_dir / f"{folder_name}.timed.video.jsonl")
     try:
-        destination.resolve().relative_to(local_videos_dir.resolve())
-    except ValueError as exc:
-        raise ValueError("output manifest must be inside storage/local_videos so relative inputs resolve safely") from exc
+        if destination.resolve().parent != local_videos_dir.resolve():
+            raise ValueError("output manifest must be directly inside storage/local_videos so relative inputs resolve safely")
+    except (OSError, ValueError) as exc:
+        raise ValueError("output manifest must be directly inside storage/local_videos so relative inputs resolve safely") from exc
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(payload, encoding="utf-8")
     return destination
