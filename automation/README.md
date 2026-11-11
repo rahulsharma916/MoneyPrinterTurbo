@@ -670,3 +670,54 @@ Test:
 ```bash
 python -m unittest automation.tests.test_build_youtube_production_workflow
 ```
+
+
+## Production execution checkpoint tracker (Phase 6 — Step 10)
+
+After generating a Step 9 workflow runbook, initialize a separate persistent checkpoint file for that channel:
+
+```bash
+python automation/track_youtube_production_checkpoints.py init \
+  --workflow storage/workflows/devotional/devotional_workflow.json \
+  --state storage/workflows/devotional/devotional_checkpoints.json
+```
+
+Use a different workflow and state path for `motivation`. Check progress and the safe resume point:
+
+```bash
+python automation/track_youtube_production_checkpoints.py status \
+  --workflow storage/workflows/devotional/devotional_workflow.json \
+  --state storage/workflows/devotional/devotional_checkpoints.json
+```
+
+When a stage has actually been run and its output has been reviewed, record it with one or more evidence files and the human reviewer's identifier:
+
+```bash
+python automation/track_youtube_production_checkpoints.py complete \
+  --workflow storage/workflows/devotional/devotional_workflow.json \
+  --state storage/workflows/devotional/devotional_checkpoints.json \
+  --stage creative_brief \
+  --evidence storage/workflows/devotional/devotional.assets.json \
+  --reviewed-by "reviewer-id" \
+  --note "Script, scenes and metadata reviewed"
+```
+
+Available stage IDs are `creative_brief`, `scene_images`, `scene_timeline`, `timed_video_task`, `render_video`, and `publishing_review`. Record the actual output file(s) for each stage as evidence. A stage cannot be marked complete when it is blocked in the current runbook, when an earlier stage is incomplete, or when evidence is missing. The tracker stores SHA-256 hashes and detects evidence files that change after approval.
+
+If new artifacts make previously blocked stages available, regenerate the Step 9 runbook and synchronize the checkpoint file:
+
+```bash
+python automation/track_youtube_production_checkpoints.py sync \
+  --workflow storage/workflows/devotional/devotional_workflow.json \
+  --state storage/workflows/devotional/devotional_checkpoints.json
+```
+
+Sync preserves only valid, sequentially completed checkpoints. If upstream evidence changes, that checkpoint and all downstream checkpoints are invalidated. Record a failure with `fail --state ... --stage ... --reason "..."`; restart from a stage with `reset --state ... --stage ...`, which clears that stage and every downstream checkpoint.
+
+**Scope and safeguards:** the tracker records evidence and human decisions; it does not execute commands, retry provider calls, render media, authorize uploads, or schedule publication. It keeps each channel's state separate. Keep checkpoint JSON and generated media in local storage, not in Git, and do not include API keys, OAuth tokens or other credentials in evidence notes.
+
+Test:
+
+```bash
+python -m unittest automation.tests.test_track_youtube_production_checkpoints
+```
