@@ -545,3 +545,45 @@ python -m unittest automation.tests.test_build_youtube_performance_intelligence
 ```
 
 The tool reads local JSON exports only; it does not upload, schedule, edit, delete, or change channel settings.
+
+
+## Content Intelligence & Growth Planner (Phase 6 — Step 7)
+
+Turn a Phase 6 Step 6 intelligence export into separate, channel-specific editorial pillars, topic ideas, format-test priorities, creative experiments and a 14-day execution framework. This is a local planning utility; it does not call an AI provider or publish content.
+
+Create the Step 6 input first:
+
+```bash
+python automation/build_youtube_performance_intelligence.py \
+  --input storage/analytics/devotional_YYYY-MM-DD_YYYY-MM-DD.json \
+  --input storage/analytics/motivation_YYYY-MM-DD_YYYY-MM-DD.json \
+  --output-json storage/analytics/channel_intelligence.json
+```
+
+Build the growth plan:
+
+```bash
+python automation/build_youtube_content_growth_plan.py \
+  --input storage/analytics/channel_intelligence.json \
+  --output-json storage/analytics/content_growth_plan.json \
+  --output-md storage/analytics/content_growth_plan.md
+```
+
+Optional reviewed video catalog: create a UTF-8 CSV with columns `channel,video_id,title,topic,format` and pass `--catalog-csv path/to/video_catalog.csv`. Exact video IDs join the catalog to Step 6 top-video rows. This enables topic analysis only for rows that have been manually mapped; the planner does not guess titles or topics from IDs.
+
+The plan provides:
+- Separate devotional and motivation content pillars and Hindi editorial idea banks.
+- Format opportunity signals based on watch hours and subscriber gains per 1,000 views, requiring at least 100 views for each of two compared creator-content types.
+- Four controlled experiments covering opening hooks, format mix, recurring series and packaging.
+- A practical 14-day review and testing framework.
+- Explicit limitations where CTR, retention curves, returning viewers or topic metadata are unavailable.
+
+The 100-view comparison threshold is an internal planning filter, not a YouTube benchmark. Format comparisons are directional and do not prove causation. CTR and returning-viewer outcomes must be checked in YouTube Studio when available. The plan does not guarantee views, subscribers, virality or watch hours. Keep channel identities, audience promises, assets and metadata separate.
+
+Run tests:
+
+```bash
+python -m unittest automation.tests.test_build_youtube_content_growth_plan
+```
+
+The planner reads local JSON/CSV files only. It does not make API calls, generate scripts or images, upload, schedule, or change channel settings.
