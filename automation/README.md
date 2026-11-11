@@ -670,3 +670,43 @@ Test:
 ```bash
 python -m unittest automation.tests.test_build_youtube_production_workflow
 ```
+
+
+## Production readiness audit (Phase 6 — Step 10)
+
+After rendering a final MP4 and creating its review-only publishing package, run the existing FFprobe quality gate first:
+
+```bash
+python automation/validate_rendered_video.py \
+  --video-file path/to/final.mp4 \
+  --audio-file path/to/final_narration.mp3 \
+  --aspect 16:9 \
+  --report path/to/video_quality.json
+```
+
+Then audit the complete artifact set for the selected channel:
+
+```bash
+python automation/build_youtube_production_readiness_audit.py \
+  --channel devotional \
+  --aspect 16:9 \
+  --assets path/to/devotional.assets.json \
+  --image-manifest path/to/image_manifest.json \
+  --timeline path/to/scene_timeline.json \
+  --timed-manifest path/to/devotional_timed_video.jsonl \
+  --audio path/to/final_narration.mp3 \
+  --video path/to/final.mp4 \
+  --quality-report path/to/video_quality.json \
+  --publishing-manifest path/to/final.publishing.json \
+  --output path/to/production_readiness.json
+```
+
+Use `--channel motivation` and its own artifact paths for the motivational channel. The audit checks file presence, channel identity consistency, scene-image availability, complete timeline alignment, timed task manifest shape/aspect, FFprobe report status and exact media-path matching, plus review-only publishing safeguards and explicit per-video audience/synthetic-media declarations.
+
+A successful result means **ready for human review**, not approved for publication. The audit does not watch the video, assess factual/cultural/creative quality, verify music/image rights, approve audience declarations, authorize uploads or schedule posts. Human review remains mandatory and channel uploads remain disabled.
+
+Test:
+
+```bash
+python -m unittest automation.tests.test_build_youtube_production_readiness_audit
+```
