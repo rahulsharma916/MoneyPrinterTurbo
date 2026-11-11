@@ -638,3 +638,32 @@ Run tests:
     python -m unittest automation.tests.test_build_youtube_growth_calendar
 
 The test also verifies that generated production CSV rows are accepted by the existing batch CSV converter.
+
+
+## End-to-end production workflow planner (Phase 6 — Step 9)
+
+Create a channel-specific workflow JSON that connects the existing creative brief, image, narration-timeline, timed-render and publishing-review tools:
+
+```bash
+python automation/build_youtube_production_workflow.py \
+  --channel devotional \
+  --subject "हनुमान जी की भक्ति और साहस" \
+  --script path/to/final_hindi_script.txt \
+  --output-dir storage/workflows/devotional \
+  --aspect 16:9
+```
+
+For the motivational channel, use `--channel motivation` and a separate output directory. Optional inputs can be supplied as they become available: `--assets`, `--image-manifest`, `--subtitles`, `--audio`, `--image-root`, `--timeline`, and `--video`. The planner:
+- Creates a JSON runbook with existing repository commands and explicit review checkpoints.
+- Keeps devotional and motivational paths separate, including asset and output naming.
+- Blocks narration-aligned timeline preparation until the final SRT, its exact source audio, and an executed image manifest are present.
+- Keeps image generation and video rendering as explicit provider-backed commands; it does not invoke them.
+- Includes a publishing-review command template with audience and synthetic-media declarations left for per-video human decisions.
+
+This is deliberately a **planner, not an autonomous runner**. Execute each listed command manually after its checkpoint, verify generated paths, and review the final MP4. The publishing package remains review-only; upload authorization, public visibility and scheduling remain disabled. Do not copy placeholder declarations into a real package without reviewing the actual video.
+
+Test:
+
+```bash
+python -m unittest automation.tests.test_build_youtube_production_workflow
+```
