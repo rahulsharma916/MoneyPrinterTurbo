@@ -157,10 +157,18 @@ def sync_state(workflow_path: Path, state_path: Path) -> dict[str, Any]:
         raise ValueError("channel mismatch: refusing to sync state across channels")
     previous = state["stages"]
     updated: dict[str, Any] = {}
+    prior_checkpoints_valid = True
     for stage in stages:
         stage_id = stage["id"]
         old = previous.get(stage_id)
-        if isinstance(old, dict) and old.get("status") == "completed" and _evidence_is_current(old):
+        can_preserve = (
+            prior_checkpoints_valid
+            and stage["status"] == "ready"
+            and isinstance(old, dict)
+            and old.get("status") == "completed"
+            and _evidence_is_current(old)
+        )
+        if can_preserve:
             updated[stage_id] = old
         else:
             updated[stage_id] = {
@@ -172,6 +180,7 @@ def sync_state(workflow_path: Path, state_path: Path) -> dict[str, Any]:
                 "note": None,
                 "failure": None,
             }
+            prior_checkpoints_valid = False
     state["stages"] = updated
     state["workflow_file"] = str(workflow_path.resolve())
     state["workflow_sha256"] = workflow_hash
@@ -276,14 +285,19 @@ def status_report(workflow_path: Path, state_path: Path) -> dict[str, Any]:
     report_stages: list[dict[str, Any]] = []
     resume_stage = None
     completed = 0
+    prior_checkpoints_valid = True
     for stage in workflow_stages:
         record = records.get(stage["id"], {})
         current = record.get("status", "pending")
         evidence_valid = _evidence_is_current(record) if current == "completed" else None
         if current == "completed" and not evidence_valid:
             current = "stale_evidence"
+        if not prior_checkpoints_valid and current == "completed":
+            current = "blocked_by_prior_checkpoint"
         if current == "completed":
             completed += 1
+        else:
+            prior_checkpoints_valid = False
         if resume_stage is None and current != "completed":
             resume_stage = stage["id"]
         report_stages.append({
