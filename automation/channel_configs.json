@@ -6,78 +6,30 @@
       "youtube_channel_id": "",
       "content_profile": "devotional",
       "language": "hi-IN",
-      "defaults": {
-        "shorts_aspect": "9:16",
-        "long_form_aspect": "16:9",
-        "voice_name": "",
-        "voice_rate": 1,
-        "voice_volume": 1,
-        "subtitle_enabled": true
-      },
+      "defaults": {"shorts_aspect":"9:16","long_form_aspect":"16:9","voice_name":"","voice_rate":1,"voice_volume":1,"subtitle_enabled":true},
       "creative_direction": {
-        "visual_style": "Cinematic devotional and mythological illustration; culturally respectful iconography; rich temple, nature and epic-story environments; scene-specific visuals; avoid unrelated stock footage",
-        "thumbnail_direction": "High-contrast devotional storytelling thumbnail; one clear focal subject or symbolic scene; expressive composition; readable Hindi headline with safe margins; no fabricated scripture quotations",
-        "music_direction": "Subtle devotional instrumental atmosphere; use only licensed or original music"
+        "visual_style":"Cinematic devotional and mythological illustration; culturally respectful iconography; rich temple, nature and epic-story environments; scene-specific visuals; avoid unrelated stock footage",
+        "thumbnail_direction":"High-contrast devotional storytelling thumbnail; one clear focal subject or symbolic scene; expressive composition; readable Hindi headline with safe margins; no fabricated scripture quotations",
+        "music_direction":"Subtle devotional instrumental atmosphere; use only licensed or original music"
       },
-      "seo": {
-        "title_language": "Hindi",
-        "description_language": "Hindi",
-        "include_topic_keywords": true,
-        "hashtags": [
-          "#Bhakti",
-          "#SanatanDharma",
-          "#HindiKatha"
-        ]
-      },
-      "publishing": {
-        "platform": "youtube",
-        "upload_enabled": false,
-        "approval_required": true,
-        "privacy_status": "private",
-        "made_for_kids": null,
-        "synthetic_media_review_required": true,
-        "upload_post_account_env": "MPT_DEVOTIONAL_UPLOAD_POST_USERNAME",
-        "upload_post_api_key_env": "MPT_DEVOTIONAL_UPLOAD_POST_API_KEY"
-      }
+      "seo":{"title_language":"Hindi","description_language":"Hindi","include_topic_keywords":true,"hashtags":["#Bhakti","#SanatanDharma","#HindiKatha"]},
+      "analytics":{"oauth_client_secrets_env":"MPT_DEVOTIONAL_GOOGLE_OAUTH_CLIENT_SECRETS","token_storage":"user_config_directory"},
+      "publishing":{"platform":"youtube","upload_enabled":false,"approval_required":true,"privacy_status":"private","made_for_kids":null,"synthetic_media_review_required":true,"upload_post_account_env":"MPT_DEVOTIONAL_UPLOAD_POST_USERNAME","upload_post_api_key_env":"MPT_DEVOTIONAL_UPLOAD_POST_API_KEY"}
     },
     "motivation": {
       "display_name": "Motivational YouTube Channel",
       "youtube_channel_id": "",
       "content_profile": "motivation",
       "language": "hi-IN",
-      "defaults": {
-        "shorts_aspect": "9:16",
-        "long_form_aspect": "16:9",
-        "voice_name": "",
-        "voice_rate": 1,
-        "voice_volume": 1,
-        "subtitle_enabled": true
-      },
+      "defaults": {"shorts_aspect":"9:16","long_form_aspect":"16:9","voice_name":"","voice_rate":1,"voice_volume":1,"subtitle_enabled":true},
       "creative_direction": {
-        "visual_style": "Modern cinematic motivational storytelling; relatable Indian settings and characters; purposeful scene progression; grounded emotion; avoid generic repetitive stock visuals",
-        "thumbnail_direction": "Bold motivational storytelling thumbnail; one strong focal point; concise Hindi headline; high contrast and clear mobile readability; no misleading promises",
-        "music_direction": "Original or properly licensed cinematic motivational instrumental; narration remains clear"
+        "visual_style":"Modern cinematic motivational storytelling; relatable Indian settings and characters; purposeful scene progression; grounded emotion; avoid generic repetitive stock visuals",
+        "thumbnail_direction":"Bold motivational storytelling thumbnail; one strong focal point; concise Hindi headline; high contrast and clear mobile readability; no misleading promises",
+        "music_direction":"Original or properly licensed cinematic motivational instrumental; narration remains clear"
       },
-      "seo": {
-        "title_language": "Hindi",
-        "description_language": "Hindi",
-        "include_topic_keywords": true,
-        "hashtags": [
-          "#HindiMotivation",
-          "#LifeLessons",
-          "#MotivationalStory"
-        ]
-      },
-      "publishing": {
-        "platform": "youtube",
-        "upload_enabled": false,
-        "approval_required": true,
-        "privacy_status": "private",
-        "made_for_kids": null,
-        "synthetic_media_review_required": true,
-        "upload_post_account_env": "MPT_MOTIVATION_UPLOAD_POST_USERNAME",
-        "upload_post_api_key_env": "MPT_MOTIVATION_UPLOAD_POST_API_KEY"
-      }
+      "seo":{"title_language":"Hindi","description_language":"Hindi","include_topic_keywords":true,"hashtags":["#HindiMotivation","#LifeLessons","#MotivationalStory"]},
+      "analytics":{"oauth_client_secrets_env":"MPT_MOTIVATION_GOOGLE_OAUTH_CLIENT_SECRETS","token_storage":"user_config_directory"},
+      "publishing":{"platform":"youtube","upload_enabled":false,"approval_required":true,"privacy_status":"private","made_for_kids":null,"synthetic_media_review_required":true,"upload_post_account_env":"MPT_MOTIVATION_UPLOAD_POST_USERNAME","upload_post_api_key_env":"MPT_MOTIVATION_UPLOAD_POST_API_KEY"}
     }
   }
 }
