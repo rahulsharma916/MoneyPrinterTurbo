@@ -160,3 +160,38 @@ python -m unittest automation.tests.test_render_scene_images
 ```
 
 This step creates individual PNG assets; it does not assemble a finished video or guarantee visual consistency across scenes. Review the images, add any required continuity corrections, and compose the final video/thumbnail in a separate step. Keep public uploads disabled pending human review.
+
+
+## Local scene-image video assembly (Phase 5 — Step 3)
+
+Once scene PNGs have been generated with `render_scene_images.py --execute`, prepare a task that feeds those images to MoneyPrinterTurbo's existing local-material pipeline:
+
+```bash
+python automation/prepare_image_video_task.py \
+  --assets path/to/hanuman_script.devotional.assets.json \
+  --image-manifest path/to/hanuman_script.devotional.assets.images/image_manifest.json \
+  --script-file path/to/hanuman_script.txt \
+  --aspect 16:9
+```
+
+For a Shorts output, use `--aspect 9:16` (the default). The tool:
+- Requires an executed image manifest and uses only scene images marked generated or skipped-existing; thumbnail images are excluded.
+- Sorts images by scene number, copies them into `storage/local_videos/<package-channel>/`, and writes a one-task JSONL manifest under `storage/local_videos/`.
+- Configures the existing local image renderer, sequential scene order, slow zoom, subtitles, and the selected output aspect ratio.
+- Does not generate new images, audio, or metadata and does not publish or schedule anything.
+
+Then run the prepared task:
+
+```bash
+python cli.py --batch-file storage/local_videos/hanuman-script-devotional.video.jsonl
+```
+
+The actual output filename is printed by the preparation command; use that exact path. Use a separate assets package and image manifest for each channel. The existing engine turns each still image into a short moving clip and extends/combines the clips to cover the narration. **This initial integration does not align scene changes to exact narration timestamps**: the images play in order and may repeat to cover long audio. For long-form videos, review the result carefully; timestamp-level scene alignment and per-scene duration control remain future work.
+
+Run the unit tests with:
+
+```bash
+python -m unittest automation.tests.test_prepare_image_video_task
+```
+
+This is a preparation utility only. It does not bypass the existing CLI, alter the core renderer, or upload content. Human review remains mandatory.
