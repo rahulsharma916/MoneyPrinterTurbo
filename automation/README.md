@@ -587,3 +587,54 @@ python -m unittest automation.tests.test_build_youtube_content_growth_plan
 ```
 
 The planner reads local JSON/CSV files only. It does not make API calls, generate scripts or images, upload, schedule, or change channel settings.
+
+
+## Data-led Growth Calendar Generator (Phase 6 — Step 8)
+
+Convert a Phase 6 Step 7 growth plan into a dated 14-day editorial calendar and a separate MoneyPrinterTurbo-compatible production CSV. Generate each channel separately so its editorial identity and output files stay isolated.
+
+Example for the devotional channel:
+
+    python automation/build_youtube_growth_calendar.py \
+      --input storage/analytics/content_growth_plan.json \
+      --channel devotional \
+      --start-date 2026-11-12 \
+      --posts-per-week 5 \
+      --format-mix data-led \
+      --output-dir storage/calendars/devotional
+
+For the motivation channel, change --channel motivation and use a separate output directory. The default cadence is five posts per week (10 slots over 14 days); choose 1–14 posts per week to control production volume.
+
+Format mix options:
+- data-led (default): if Step 7 contains a directional comparison of creator content types, schedule two slots for the observed leading type for every one slot of the other type. If evidence is insufficient, alternate Shorts and long-form.
+- balanced: alternate Shorts and long-form.
+- shorts-heavy: two Shorts slots for every long-form slot.
+- long-form-heavy: two long-form slots for every Shorts slot.
+
+Two files are created:
+- <channel>_editorial_calendar.csv: publish date, channel, format, content pillar, topic, aspect ratio and review status for planning.
+- <channel>_production.csv: only supported MoneyPrinterTurbo task fields, including Hindi script-generation prompt, format aspect ratio, subtitles and stock-material source.
+
+### Continue into the existing production workflow
+
+    # 1. Add the channel's reusable Hindi prompt profile
+    python automation/apply_content_profile.py storage/calendars/devotional/devotional_production.csv --profile devotional
+
+    # 2. Apply channel defaults and scene-friendly creative context
+    python automation/prepare_channel_calendar.py storage/calendars/devotional/devotional_production.devotional.csv --channel devotional
+
+    # 3. Validate the prepared production CSV without writing a manifest
+    python automation/content_calendar_to_batch.py storage/calendars/devotional/devotional_production.devotional.production.csv --check
+
+    # 4. Create a batch manifest after validation
+    python automation/content_calendar_to_batch.py storage/calendars/devotional/devotional_production.devotional.production.csv
+
+Use the corresponding motivation profile and its own paths for the motivational channel. Check actual output filenames printed by each command; do not mix channel CSVs, scripts, media or manifests.
+
+**Scope and approval boundary:** this step creates dated editorial slots and production task inputs. It does not generate scripts, images, audio or videos; does not call Google/YouTube APIs; and does not upload or schedule content. The editorial dates are planning targets only, not platform-scheduled publication times. Continue through the existing render, quality-check and review-only publishing-package steps. A human must approve each video before any upload; channel upload_enabled remains false.
+
+Run tests:
+
+    python -m unittest automation.tests.test_build_youtube_growth_calendar
+
+The test also verifies that generated production CSV rows are accepted by the existing batch CSV converter.
