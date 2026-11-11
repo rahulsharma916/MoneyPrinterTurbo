@@ -223,3 +223,40 @@ python -m unittest automation.tests.test_build_scene_timeline
 ```
 
 **Important boundary:** this is a timing-analysis and review artifact only. It does not modify the video renderer or automatically apply the timeline to the final MP4 yet. Whisper/SRT recognition differences can affect match confidence, so inspect every scene boundary. The next integration step is to make the renderer consume this approved timeline and use the corresponding image for the exact scene interval.
+
+## Timed scene video preparation (Phase 5 — Step 5)
+
+Once Step 4 has produced an approved `scene_timeline.json`, prepare a local video task that renders each still for its narration interval and then passes the resulting clips to the existing MoneyPrinterTurbo video pipeline.
+
+Use the **same final narration audio file** that was used to create the SRT/timeline:
+
+```bash
+python automation/prepare_timed_scene_video_task.py \
+  --timeline path/to/scene_timeline.json \
+  --image-root path/to/story.devotional.assets.images \
+  --audio-file path/to/final_narration.mp3 \
+  --script-file path/to/final_script.txt \
+  --aspect 16:9
+```
+
+For a Shorts video, use `--aspect 9:16`. Use `--image-motion static` if you prefer no zoom movement. The tool:
+- Requires every scene to be aligned and every image to be present under `--image-root`; it stops rather than guessing timings for low-confidence scenes.
+- Holds the first image from the beginning of the video, changes scenes at the next aligned narration start, and holds the final image through the audio tail plus a short safety margin.
+- Renders one MP4 clip per scene, copies the narration audio and clips into a channel-specific folder under `storage/local_videos/`, and writes a one-task JSONL manifest.
+- Uses the same narration audio as a custom audio input, so the generated video does not depend on regenerating TTS.
+
+Run the prepared task using the exact manifest path printed by the command:
+
+```bash
+python cli.py --batch-file storage/local_videos/<printed-manifest-name>.jsonl
+```
+
+**Subtitle note:** custom audio does not provide a TTS subtitle maker. To burn subtitles through the existing pipeline, configure the MoneyPrinterTurbo subtitle provider as `whisper`; other providers may skip subtitle generation for custom audio. The SRT used to build the scene timeline is used for timing analysis, not automatically burned into the MP4 by this preparation utility.
+
+Test with:
+
+```bash
+python -m unittest automation.tests.test_prepare_timed_scene_video_task
+```
+
+This step prepares timed scene clips and a task manifest; it does not upload or schedule content. The final renderer still applies the engine's standard clip concatenation and safety margin. Inspect the complete MP4, especially scene boundaries and the final narration tail, before publishing. Keep the devotional and motivational asset packages, audio, and manifests separate.
