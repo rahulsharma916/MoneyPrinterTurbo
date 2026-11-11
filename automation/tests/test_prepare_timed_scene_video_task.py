@@ -109,7 +109,9 @@ class TimedSceneVideoTaskTests(unittest.TestCase):
         self.assertEqual(task["video_concat_mode"], "sequential")
         self.assertEqual(task["video_source"], "local")
         self.assertEqual(len(task["video_materials"]), 2)
-        self.assertEqual(task["custom_audio_file"], "devotional/narration.mp3")
+        folder_name = Path(task["custom_audio_file"]).parts[0]
+        self.assertTrue(folder_name.startswith("devotional-"))
+        self.assertEqual(Path(task["custom_audio_file"]).name, "narration.mp3")
         self.assertEqual(task["video_clip_duration"], 9)
         self.assertTrue((local_videos / task["video_materials"][0]["url"]).is_file())
         self.assertTrue((local_videos / task["video_materials"][1]["url"]).is_file())
