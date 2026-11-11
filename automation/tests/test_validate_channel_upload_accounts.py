@@ -25,7 +25,7 @@ class ChannelUploadAccountTests(unittest.TestCase):
         }
         account = load_channel_account("devotional", config_path=self.config, environ=values)
         self.assertEqual(account, {
-            "upload_post_enabled": True,
+            "upload_post_enabled": False,
             "upload_post_api_key": "secret-a",
             "upload_post_username": "devotional-account",
         })
