@@ -250,7 +250,13 @@ class UploadPostService:
                         data.append(('youtube_description', youtube_extra["youtube_description"]))
                     for tag in youtube_extra.get("tags", []):
                         data.append(('tags[]', tag))
-                    data.append(('containsSyntheticMedia', "true"))
+                    contains_synthetic_media = youtube_extra.get("containsSyntheticMedia", True)
+                    if not isinstance(contains_synthetic_media, bool):
+                        return {
+                            "success": False,
+                            "error": "YouTube synthetic-media declaration must be a boolean",
+                        }
+                    data.append(('containsSyntheticMedia', str(contains_synthetic_media).lower()))
 
                 headers = {'Authorization': f'Apikey {self.api_key}'}
 
