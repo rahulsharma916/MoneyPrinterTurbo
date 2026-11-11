@@ -132,13 +132,20 @@ def build_workflow(
         "requires": ["review task manifest", "confirm TTS/subtitle/music provider settings"],
         "provider_call": True,
     })
+    publishing_command = [
+        "python", "automation/prepare_youtube_publishing_package.py",
+        "--channel", channel, "--assets", str(assets), "--video", str(video),
+    ]
+    if thumb:
+        publishing_command.extend(["--thumbnail", str(thumb)])
+    publishing_command.extend([
+        "--made-for-kids", "<review-and-set-yes-or-no>",
+        "--synthetic-media", "<review-and-set-yes-or-no>",
+    ])
     commands.append({
         "id": "publishing_review",
         "stage": "prepare_youtube_publishing_package",
-        "command": ["python", "automation/prepare_youtube_publishing_package.py",
-                    "--channel", channel, "--assets", str(assets), "--video", str(video),
-                    "--made-for-kids", "<review-and-set-yes-or-no>",
-                    "--synthetic-media", "<review-and-set-yes-or-no>"],
+        "command": publishing_command,
         "requires": [
             "final video exists and has been watched end-to-end",
             "thumbnail, metadata, copyright, audience and synthetic-media declarations reviewed",
@@ -206,7 +213,7 @@ def main() -> int:
         )
         destination = args.output or args.output_dir / f"{args.channel}_workflow.json"
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_text(json.dumps(workflow, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        destination.write_text(json.dumps(workflow, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     except (OSError, ValueError) as exc:
         print(f"Workflow not created: {exc}", file=sys.stderr)
         return 2
