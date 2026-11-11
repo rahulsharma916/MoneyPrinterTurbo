@@ -242,7 +242,7 @@ python automation/prepare_timed_scene_video_task.py \
 For a Shorts video, use `--aspect 9:16`. Use `--image-motion static` if you prefer no zoom movement. The tool:
 - Requires every scene to be aligned and every image to be present under `--image-root`; it stops rather than guessing timings for low-confidence scenes.
 - Holds the first image from the beginning of the video, changes scenes at the next aligned narration start, and holds the final image through the audio tail plus a short safety margin.
-- Renders one MP4 clip per scene, copies the narration audio and clips into a channel-specific folder under `storage/local_videos/`, and writes a one-task JSONL manifest.
+- Renders one MP4 clip per scene, copies the narration audio and clips into a channel-specific folder under `storage/local_videos/`, and writes a one-task JSONL manifest directly under `storage/local_videos/` (the optional `--output` path must also be directly inside that directory).
 - Uses the same narration audio as a custom audio input, so the generated video does not depend on regenerating TTS.
 
 Run the prepared task using the exact manifest path printed by the command:
