@@ -721,3 +721,53 @@ Test:
 ```bash
 python -m unittest automation.tests.test_track_youtube_production_checkpoints
 ```
+
+
+## Production performance, cost and quality intelligence (Phase 6 — Step 11)
+
+Combine local checkpoint evidence with optional technical video-quality reports, the existing publishing-outcome report, and a cost ledger containing actual recorded provider charges:
+
+```bash
+python automation/build_youtube_production_intelligence.py \
+  --checkpoint storage/workflows/devotional/devotional_checkpoints.json \
+  --checkpoint storage/workflows/motivation/motivation_checkpoints.json \
+  --quality-report storage/quality/devotional_video_quality.json \
+  --publishing-report storage/reports/publishing_report.json \
+  --cost-ledger storage/reports/provider_cost_ledger.json \
+  --output-json storage/reports/production_intelligence.json \
+  --output-csv storage/reports/production_intelligence.csv
+```
+
+Use only files that actually exist. Omit optional report inputs when unavailable. The cost ledger format is:
+
+```json
+{
+  "records": [
+    {
+      "channel": "devotional",
+      "stage": "scene_images",
+      "provider": "provider-name",
+      "amount": 12.5,
+      "currency": "INR",
+      "source": "provider-invoice"
+    }
+  ]
+}
+```
+
+Each amount must be an actual recorded charge from an invoice, provider usage page, or other reliable account record. Do not enter estimated or assumed prices as actual spend. Multiple currencies are kept separate and are never added together.
+
+The report includes:
+- Per-channel workflow and stage totals, failed/blocked/pending stages, stale evidence, evidence file counts and file sizes.
+- Technical quality outcomes from supplied FFprobe validation JSON reports; a report is assigned to a channel only when its video path includes an explicit `devotional` or `motivation` path segment.
+- Publishing package outcomes from the existing local publishing report, kept separate from YouTube audience analytics.
+- Optional provider cost totals grouped by channel and currency.
+- JSON detail and a channel-level CSV summary.
+
+**Interpretation limits:** without a cost ledger, costs are unknown—not zero. Evidence file sizes are not storage charges. Technical validation does not assess storytelling, cultural accuracy, Hindi pronunciation, subtitle readability, visual quality or retention. Publishing outcomes do not equal views, watch hours, revenue or monetization eligibility. No external APIs are called and no provider prices are inferred.
+
+Test:
+
+```bash
+python -m unittest automation.tests.test_build_youtube_production_intelligence
+```
