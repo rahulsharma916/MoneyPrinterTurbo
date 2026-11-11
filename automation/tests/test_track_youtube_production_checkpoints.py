@@ -102,6 +102,19 @@ class ProductionCheckpointTrackerTests(unittest.TestCase):
         self.assertEqual(state["stages"]["scene_timeline"]["status"], "blocked")
         self.assertEqual(state["stages"]["creative_brief"]["status"], "completed")
 
+    def test_upstream_evidence_change_invalidates_downstream_on_sync(self):
+        self.workflow["stages"][2]["status"] = "ready"
+        self._write_workflow()
+        sync_state(self.workflow_path, self.state_path)
+        self._complete("creative_brief", "assets.json")
+        self._complete("scene_images", "images.json")
+        assets = self.root / "assets.json"
+        assets.write_text("changed upstream asset", encoding="utf-8")
+        state = sync_state(self.workflow_path, self.state_path)
+        self.assertEqual(state["stages"]["creative_brief"]["status"], "pending")
+        self.assertEqual(state["stages"]["scene_images"]["status"], "pending")
+        self.assertEqual(state["stages"]["scene_timeline"]["status"], "pending")
+
     def test_channel_mismatch_prevents_cross_channel_state_use(self):
         self.workflow["channel"] = "motivation"
         self._write_workflow()
