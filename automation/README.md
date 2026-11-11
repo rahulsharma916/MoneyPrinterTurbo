@@ -415,3 +415,34 @@ python -m unittest test.services.test_upload_post_synthetic_media_declaration
 ```
 
 These tests are added to the repository; they must be executed in your local/runtime environment before production use.
+
+
+## Channel-wise publishing outcome reports (Phase 6 — Step 4)
+
+After running the approved publishing command, aggregate the local `*.publishing.json` manifests into separate devotional and motivational channel summaries:
+
+```bash
+python automation/build_publishing_report.py \
+  --input-dir path/to/publishing-packages \
+  --output-json path/to/reports/publishing_report.json \
+  --output-csv path/to/reports/publishing_report.csv
+```
+
+The input directory is searched recursively. The report includes:
+- One record per valid publishing manifest, with channel, subject, title, privacy and audience declarations.
+- Workflow status: pending review, approved, submitting, completed, failed or outcome unconfirmed.
+- Human approval identity/time, attempt start/end time, Upload-Post request ID and whether an error was recorded.
+- Separate totals for each channel, including completed, failed, unconfirmed, pending-review and approved-not-submitted counts.
+- Warnings for invalid manifests, without aborting the entire report.
+
+The CSV is UTF-8 with BOM for spreadsheet compatibility. The JSON and CSV include local file paths; store and share them only with people authorized to see your production file structure. Raw error text and credentials are intentionally excluded.
+
+**Measurement boundary:** this is an operational publishing report, not YouTube performance analytics. It does not fetch views, impressions, watch time, CTR, subscribers, revenue, audience retention, or confirm public availability on YouTube. A completed Upload-Post response means the provider reported completion; verify the video in YouTube Studio. For actual channel performance, use YouTube Studio/YouTube Analytics separately.
+
+Run tests:
+
+```bash
+python -m unittest automation.tests.test_build_publishing_report
+```
+
+Tests are added but must be run in your environment before relying on the report in production.
