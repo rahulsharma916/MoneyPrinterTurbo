@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -160,8 +161,9 @@ def _cost_summary(path: Path | None) -> dict[str, Any]:
             raise ValueError(f"cost record {index}: currency is required")
         if not isinstance(provider, str) or not provider.strip():
             raise ValueError(f"cost record {index}: provider is required")
-        if isinstance(amount, bool) or not isinstance(amount, (int, float)) or amount < 0:
-            raise ValueError(f"cost record {index}: amount must be a non-negative number")
+        if (isinstance(amount, bool) or not isinstance(amount, (int, float))
+                or not math.isfinite(amount) or amount < 0):
+            raise ValueError(f"cost record {index}: amount must be a finite non-negative number")
         stage = str(item.get("stage") or "unspecified")
         key = f"{channel}:{currency.upper()}"
         totals[key]["amount"] += float(amount)
