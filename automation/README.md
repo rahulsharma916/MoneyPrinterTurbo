@@ -102,3 +102,28 @@ MoneyPrinterTurbo already contains script generation, social metadata generation
 - Keep uploads disabled until you review the video, title, description, tags, audience declaration, synthetic-media disclosure, and privacy.
 - Review script accuracy, visual relevance, music licensing, and subtitles before publishing.
 - Never assume a default TTS voice is suitable; verify it is configured and pronounce Hindi correctly.
+
+
+## AI scene, thumbnail and YouTube metadata brief (Phase 5 — Step 1)
+
+Generate a structured creative brief from a finished Hindi script. Run from the repository root after configuring a working LLM provider in MoneyPrinterTurbo:
+
+```bash
+python automation/generate_content_assets.py --channel devotional --subject "हनुमान जी की भक्ति और साहस" --script-file path/to/hanuman_script.txt
+python automation/generate_content_assets.py --channel motivation --subject "अनुशासन की ताकत" --script-file path/to/discipline_script.txt
+```
+
+The output is a separate JSON file containing:
+- Chronological scenes with script excerpts, visual descriptions, standalone image prompts, English stock-search terms, and motion directions.
+- A channel-specific 16:9 thumbnail concept, short Hindi headline, and image-generation prompt.
+- YouTube title, description, tags, and hashtags in the configured channel language.
+
+Use `--output` to choose a destination file. The tool uses the configured MoneyPrinterTurbo LLM provider and therefore may incur provider charges or usage limits.
+
+Validate the parser and channel separation with:
+
+```bash
+python -m unittest automation.tests.test_generate_content_assets
+```
+
+**Scope boundary:** this step generates creative prompts and metadata only. It does not render image files, compose a thumbnail image, generate a video, or upload/schedule content. Use the image prompts with a separately configured image provider or approved image-generation workflow. Review every generated scene for script accuracy, cultural sensitivity, licensing, and visual consistency. Review SEO copy for factual accuracy before publishing. Public uploads remain disabled and require human approval.
