@@ -10,8 +10,8 @@
         "shorts_aspect": "9:16",
         "long_form_aspect": "16:9",
         "voice_name": "",
-        "voice_rate": 1.0,
-        "voice_volume": 1.0,
+        "voice_rate": 1,
+        "voice_volume": 1,
         "subtitle_enabled": true
       },
       "creative_direction": {
@@ -23,7 +23,11 @@
         "title_language": "Hindi",
         "description_language": "Hindi",
         "include_topic_keywords": true,
-        "hashtags": ["#Bhakti", "#SanatanDharma", "#HindiKatha"]
+        "hashtags": [
+          "#Bhakti",
+          "#SanatanDharma",
+          "#HindiKatha"
+        ]
       },
       "publishing": {
         "platform": "youtube",
@@ -32,7 +36,8 @@
         "privacy_status": "private",
         "made_for_kids": null,
         "synthetic_media_review_required": true,
-        "upload_post_account_env": "MPT_DEVOTIONAL_UPLOAD_POST_USERNAME"
+        "upload_post_account_env": "MPT_DEVOTIONAL_UPLOAD_POST_USERNAME",
+        "upload_post_api_key_env": "MPT_DEVOTIONAL_UPLOAD_POST_API_KEY"
       }
     },
     "motivation": {
@@ -44,8 +49,8 @@
         "shorts_aspect": "9:16",
         "long_form_aspect": "16:9",
         "voice_name": "",
-        "voice_rate": 1.0,
-        "voice_volume": 1.0,
+        "voice_rate": 1,
+        "voice_volume": 1,
         "subtitle_enabled": true
       },
       "creative_direction": {
@@ -57,7 +62,11 @@
         "title_language": "Hindi",
         "description_language": "Hindi",
         "include_topic_keywords": true,
-        "hashtags": ["#HindiMotivation", "#LifeLessons", "#MotivationalStory"]
+        "hashtags": [
+          "#HindiMotivation",
+          "#LifeLessons",
+          "#MotivationalStory"
+        ]
       },
       "publishing": {
         "platform": "youtube",
@@ -66,7 +75,8 @@
         "privacy_status": "private",
         "made_for_kids": null,
         "synthetic_media_review_required": true,
-        "upload_post_account_env": "MPT_MOTIVATION_UPLOAD_POST_USERNAME"
+        "upload_post_account_env": "MPT_MOTIVATION_UPLOAD_POST_USERNAME",
+        "upload_post_api_key_env": "MPT_MOTIVATION_UPLOAD_POST_API_KEY"
       }
     }
   }
