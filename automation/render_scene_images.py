@@ -96,6 +96,7 @@ def render_package(
         "execution": "executed" if execute else "dry_run",
         "images": [],
     }
+    context = codex_image.capture_context() if execute else None
     for filename, prompt, kind, scene_number in jobs:
         destination = output_dir / filename
         entry = {"file": str(destination), "kind": kind, "scene_number": scene_number}
@@ -106,9 +107,14 @@ def render_package(
             entry["prompt_preview"] = prompt[:240]
         else:
             # One request at a time; do not retry ambiguous image calls.
-            image_bytes = codex_image.generate_image(prompt, codex_image.capture_context())
-            width, height = save_png(image_bytes, destination)
-            entry.update({"status": "generated", "width": width, "height": height})
+            try:
+                image_bytes = codex_image.generate_image(prompt, context)
+                width, height = save_png(image_bytes, destination)
+                entry.update({"status": "generated", "width": width, "height": height})
+            except codex_image.CodexImageError as exc:
+                entry.update({"status": "failed", "error": str(exc)})
+                manifest["images"].append(entry)
+                break  # Do not retry an ambiguous or potentially billable image request.
         manifest["images"].append(entry)
     return manifest
 
@@ -147,6 +153,9 @@ def main() -> int:
         print(f"Manifest: {manifest_path}")
         if not args.execute:
             print("Dry run only. Add --execute to call the configured image provider.")
+        if any(item["status"] == "failed" for item in manifest["images"]):
+            print("Rendering stopped after a provider error; inspect the manifest before retrying.", file=sys.stderr)
+            return 2
         return 0
     except (OSError, UnicodeError, ValueError, codex_image.CodexImageError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
