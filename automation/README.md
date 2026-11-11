@@ -195,3 +195,31 @@ python -m unittest automation.tests.test_prepare_image_video_task
 ```
 
 This is a preparation utility only. It does not bypass the existing CLI, alter the core renderer, or upload content. Human review remains mandatory.
+
+
+## Narration-aligned scene timeline (Phase 5 — Step 4)
+
+After the final narration audio has been transcribed to SRT, align each generated scene's `narration_excerpt` against the subtitle cues:
+
+```bash
+python automation/build_scene_timeline.py \
+  --assets path/to/story.devotional.assets.json \
+  --image-manifest path/to/story.devotional.assets.images/image_manifest.json \
+  --subtitles path/to/narration.srt
+```
+
+The utility:
+- Uses the scene excerpt text from the AI asset package and only images marked generated/skipped-existing in an executed image manifest.
+- Matches excerpts against SRT cue text in chronological order, using approximate token matching to tolerate minor speech-recognition differences.
+- Writes `scene_timeline.json` with start/end times, duration, match score and image path for each scene.
+- Marks low-confidence or unmatched scenes for manual review instead of silently assigning a misleading timestamp.
+
+Optional: set a stricter match threshold with `--min-score 0.70`. The default is 0.55. If the command exits with status 1, one or more scenes need manual review; status 2 indicates invalid input or an execution error.
+
+Validate with:
+
+```bash
+python -m unittest automation.tests.test_build_scene_timeline
+```
+
+**Important boundary:** this is a timing-analysis and review artifact only. It does not modify the video renderer or automatically apply the timeline to the final MP4 yet. Whisper/SRT recognition differences can affect match confidence, so inspect every scene boundary. The next integration step is to make the renderer consume this approved timeline and use the corresponding image for the exact scene interval.
